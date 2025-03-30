@@ -15,17 +15,18 @@
 - transformer
 - hyper-parameter optimizer [type: meta-heuristic algorithm]
     （超參數優化器 [形式：元啟發式演算法]）
-- evaluation metric （評估指標）
+- evaluation metric for transformer（transformer 評估指標）
 - meta-heuristic algorithm pool （演算法池）
 
-![pic](./md_picture/algorithm_base.png)
+![structure picture](./markdown_source/algorithm_base.png)
 
-1. target problem form: 將使用 CEC benchMark (2005~2025)
-2. embedding model: 目前將使用現成的 embedding model 進行試驗（未來將額外計劃訓練該 embedding model）
+1. target problem form: 將使用 CEC benchMark (2005~2025) 以及其他更多benchmark function, 但問題輸入控制在single objective.
+2. embedding model: 目前將使用現成的 embedding model 進行試驗 （<span style='color:yellow'>未來將額外計劃訓練該 embedding model</sapn>）
+    - 應是使用 Hugging-face `(未定)` transformer
 
 3. transformer:
-    - 將使用現成的 transformer 進行遷移訓練（transfer training）（未來將額外計劃從頭訓練 transformer）
-    - 訓練將使用 CEC 2024~2025 以外的 benchmark function當作train data
+    - 將使用現成的 transformer 進行遷移訓練（transfer training）（<span style='color:yellow'>未來將額外計劃從頭訓練 transformer</span>）
+    - 訓練將使用 CEC 2024~2025 <span style="color:red" >以外</span> 的 benchmark function當作train data
 
 4. hyper-parameter optimizer：
     - 使用差分進化 (視時間成本來增加更多組調整/對照)
@@ -41,7 +42,7 @@
     ```
 
 5. evaluation metric for tansformer:
-    - 訓練將使用 CEC 2024~2025 以外的 benchmark function當作 valid data
+    - 訓練將使用 CEC 2024~2025 <span style="color:red" >以外</span> 的 benchmark function當作 valid data
     - 將根據loss function 來評估 transformer 的表現
 
 6. meta-heuristic algorithm pool:
@@ -50,11 +51,12 @@
 
 <!-- RL -->
 
-## 評估指標
+## 總體架構評估指標
 
 1. 最終收斂結果 (fitness value)
-2. 收斂速度 (iterations)
+2. 收斂速度 (iterations to reach the approximate solution)
 3. 族群多樣性 (收斂情況)
+4. 
 
 ## 對比實驗設計
 
