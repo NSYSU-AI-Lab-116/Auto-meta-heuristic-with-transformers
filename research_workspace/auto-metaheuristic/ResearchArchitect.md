@@ -69,3 +69,4 @@
 ## questions
 
 - 我們該如何 evaluate 特定組合的算法的成效？（迭代演算法組合？隨機抽選？ 部件重組？）
+- 在定義上我們應該要認定這是 auto-metaheuristic 還是 hypermetaheuristic(使用transformer選擇演算法策略好像又有點後者的感覺)
