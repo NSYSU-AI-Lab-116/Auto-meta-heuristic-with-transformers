@@ -1,0 +1,53 @@
+# Hyper-heuristic prototype
+
+// For transformer-base Automated meta-heuristic, please goto ./(discard)ResearchArchitecture
+
+## packages
+
+- python
+- matplotlib
+- opfunu
+- tqdm
+
+## Implementation method
+
+Using a meta-heuristic algorithm to select the best combination of meta-heurstic algorithms (So the hyper algrithm is called hyper-heuristic algorithm). The implementation method can be toll apart into several keypoint
+
+- target problem form
+- hyper-heuristc algorithm
+- meta-heuristic algorithm pool
+- evaluation metric
+
+![HH structure picture](./markdown_source/Hyper-heuristic_workflow_chart.png)
+
+1. target problem form
+    - We'll be using <span style="color:red">CEC benchMark (2005~2025) and other benchmark function.</span> But limited in using single objective.
+    - <span style="color:red">INPUT（Pseudo input）</span>：Function label. Including functions, degs and number of terms
+    - <span style="color:red">OUTPUT</span>： A fixed numbers of list that shows meta-heuristic sequence
+
+2. hyper-heuristic algorithm
+    - <span style="color:red">We'll be using DE(Deferential Evolution) algorithm</span>
+    - Try out more meta-hueristic algorithm for comparison(If possible)
+
+3. meta-heuristic algorithm pool
+    - <span style="color:red">We'll be using the current set of our algorithm pool (GWO series, PSO, HHO)</span>
+    - we can control the release time of specific algorithm(which mean it can be only used in specific time)
+
+4. evaluation metric
+    - Target function fitness value
+    - Convergence speed(time)
+    - Convergence stability
+    - Convergence rate
+
+## Possible cmoparison of works
+
+- Changing the release time for each meta-heuristic algorithm
+- Try another hyper-heuristic algorithm
+- Try out more functions(target function)
+- <span style="color:yellow">With/Without attention</span>
+- <span style="color:yellow">random hyper-param for hyper-heuristic</span>
+- other rule base
+
+## Ideas (Write down your ideas here)
+
+## Questions

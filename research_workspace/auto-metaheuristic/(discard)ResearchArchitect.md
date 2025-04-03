@@ -7,6 +7,7 @@
 - matplotlib
 - transformer (hugging face)
 - opfunu
+- <span style="color:yellow">更多CEC benchmark</span>
 
 ## 實現方法
 
@@ -20,18 +21,18 @@
 - evaluation metric for transformer（transformer 評估指標）
 - meta-heuristic algorithm pool （演算法池）
 
-![structure picture](./markdown_source/workflow.png)
+![Auto-MH structure picture](./markdown_source/Automated_meta-heuristic_workflow_chart.png)
 
 1. target problem form: 將使用 CEC benchMark (2005~2025) 以及其他更多 benchmark function, 但問題輸入控制在 single objective.
 2. embedding model: 目前將使用現成的 embedding model 進行試驗 （<span style='color:yellow'>未來將額外計劃訓練該 embedding model</sapn>）
 
-   - 應是使用 Hugging-face `(未定)` transformer
+   - 應是使用 `(未定)` transformer
 
 3. transformer:
 
    - 將使用現成的 transformer 進行遷移訓練（transfer training）（<span style='color:yellow'>未來將額外計劃從頭訓練 transformer</span>）
    - 訓練將使用 CEC 2024~2025 <span style="color:red" >以外</span> 的 benchmark function 當作 train data
-   - 使用多個相同的transformer模型，並以完成結果進行加權，將獲得最多加權的算法排序應用到問題中
+   - 使用多個相同的transformer模型，並以完成結果進行加權，將獲得最多加權的算法排序應用到問題。
 
 4. hyper-parameter optimizer：
 
@@ -69,4 +70,5 @@
 ## questions
 
 - 我們該如何 evaluate 特定組合的算法的成效？（迭代演算法組合？隨機抽選？ 部件重組？）
-- 在定義上我們應該要認定這是 auto-metaheuristic 還是 hypermetaheuristic(使用transformer選擇演算法策略好像又有點後者的感覺)
+- 在定義上我們應該要認定這是 automated -metaheuristic 還是 hyper-heuristic(使用transformer選擇演算法策略應該是後者)
+- Transformer 的訓練資料從哪裡來？(<span style="color:red">需要數百筆的標記資料<span>)
