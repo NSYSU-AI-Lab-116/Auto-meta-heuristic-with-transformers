@@ -38,6 +38,8 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
     - Convergence speed (time)
     - Convergence stability
     - Convergence rate
+    - Explainable decision making(if feasible)
+    - Consistency on decision making
 
 ## Possible comparison of works
 
