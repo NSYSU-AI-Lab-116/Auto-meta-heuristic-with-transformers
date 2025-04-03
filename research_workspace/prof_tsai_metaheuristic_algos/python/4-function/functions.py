@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import math
-
+import matplotlib.pyplot as plt
+import numpy as np
 sqrt = math.sqrt
 sin = math.sin
 cos = math.cos
@@ -19,4 +20,16 @@ function_table = {
 }
 
 if __name__ == "__main__":
+    x = np.linspace(-1000, 1000, 100000)
+    y = np.linspace(-1000, 1000, 100000)
+    X,Y = np.meshgrid(x,y)
+    Z = np.vectorize(mvfAckley)(2, [X,Y])
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8)
+    plt.title("Ackley Function")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+    plt.show()
+    
     pass

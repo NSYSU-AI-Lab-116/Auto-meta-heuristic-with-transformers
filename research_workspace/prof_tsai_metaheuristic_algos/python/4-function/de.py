@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import numpy as np; import time; import sys; import os; import functions
 from lib import *
+import matplotlib.pyplot as plt
+
+convergence = []
 
 class de:
     def __init__(self, num_runs = 3, num_evals = 1000, num_dims = 2, filename_ini = "", filename_ins = "mvfAckley", pop_size = 10, F = 0.7, cr = 0.5, v_min = -32.0, v_max = 32.0):
@@ -41,12 +44,19 @@ class de:
                         avg_obj_val_eval[eval_count] += self.best_obj_val
                         eval_count +=1
             avg_obj_val += self.best_obj_val
+            convergence.append(self.best_obj_val)
         # 4. output
         avg_obj_val /= self.num_runs
         for i in range(self.num_evals):
             avg_obj_val_eval[i] /= self.num_runs
             print("%.15f" % avg_obj_val_eval[i])
         # return curr_pop
+        plt.plot(range(self.num_evals), avg_obj_val_eval)
+        plt.title("Convergence of DE")
+        plt.xlabel("Number of evaluations")
+        plt.ylabel("Objective value")
+        plt.show()
+        
         return self.best_sol
 
     def init(self):
