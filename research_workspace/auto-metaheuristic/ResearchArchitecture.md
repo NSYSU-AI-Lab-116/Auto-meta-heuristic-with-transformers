@@ -50,9 +50,11 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 
 ## <span style="color:red">GOALS</span>
 
-1. Get AS MUCH AS POSSIBLE labled function from this hyper-heuristic algorithm's result in order to build a automated meta-heuristic transformer
+1. Get AS MUCH AS POSSIBLE labled function from this hyper-heuristic algorithm's result in order to build a automated meta-heuristic transformer(Long-term goals)
 
 2. Get the best combination of meta-heuristic algorithm
+
+3. Explore the impact of self-attention machanisms on the quality of decision-making
 
 ## Ideas (Write down your ideas here)
 
