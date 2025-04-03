@@ -18,7 +18,7 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 - meta-heuristic algorithm pool
 - evaluation metric
 
-![HH structure picture](./markdown_source/Hyper-heuristic_workflow_chart.png)
+![HH structure picture](./markdown_source/HH/Hyper-heuristic_workflow_chart.png)
 
 1. target problem form
     - We'll be using <span style="color:red">CEC benchMark (2005~2025) and other benchmark function.</span> But limited in using single objective.
@@ -47,6 +47,12 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 - <span style="color:yellow">With/Without attention</span>
 - <span style="color:yellow">random hyper-param for hyper-heuristic</span>
 - other rule base
+
+## <span style="color:red">GOALS</span>
+
+1. Get SA MUCH AS POSSIBLE labled function from this hyper-heuristic algorithm's result in order to make the Transformer of automated meta-heuristic
+
+2. Get the best combination of meta-heuristic algorithm
 
 ## Ideas (Write down your ideas here)
 

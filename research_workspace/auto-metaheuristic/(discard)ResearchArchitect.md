@@ -21,7 +21,7 @@
 - evaluation metric for transformer（transformer 評估指標）
 - meta-heuristic algorithm pool （演算法池）
 
-![Auto-MH structure picture](./markdown_source/Automated_meta-heuristic_workflow_chart.png)
+![Auto-MH structure picture](./markdown_source/automated-MH/Automated_meta-heuristic_workflow_chart.png)
 
 1. target problem form: 將使用 CEC benchMark (2005~2025) 以及其他更多 benchmark function, 但問題輸入控制在 single objective.
 2. embedding model: 目前將使用現成的 embedding model 進行試驗 （<span style='color:yellow'>未來將額外計劃訓練該 embedding model</sapn>）
