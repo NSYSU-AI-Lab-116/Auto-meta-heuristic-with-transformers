@@ -26,7 +26,7 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
     - <span style="color:red">OUTPUT</span>： A fixed numbers of list that shows meta-heuristic sequence
 
 2. hyper-heuristic algorithm
-    - <span style="color:red">We'll be using DE(Deferential Evolution) algorithm</span>
+    - <span style="color:red">We'll be using DE (Deferential Evolution) algorithm</span>
     - Try out more meta-hueristic algorithm for comparison (If possible)
 
 3. meta-heuristic algorithm pool
@@ -39,7 +39,7 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
     - Convergence stability
     - Convergence rate
 
-## Possible cmoparison of works
+## Possible comparison of works
 
 - Changing the release time for each meta-heuristic algorithm
 - Try another hyper-heuristic algorithm
