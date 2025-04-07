@@ -23,15 +23,17 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 1. target problem form
     - We'll be using <span style="color:red">CEC benchMark (2005~2025) and other benchmark function.</span> But limited to using single objective.
     - <span style="color:red">INPUT（Pseudo input）</span>：Function label. Including functions, degs and number of terms
-    - <span style="color:red">OUTPUT</span>： A fixed numbers of list that shows meta-heuristic sequence
+    - <span style="color:red">OUTPUT</span>：A list that shows each optimizer's parameter according to index [[algos_pos, weight, hyper-parameter, etc.], [other optimizer]...]
 
 2. hyper-heuristic algorithm
     - <span style="color:red">We'll be using DE (Deferential Evolution) algorithm</span>
     - Try out more meta-hueristic algorithm for comparison (If possible)
+    - pre-measurement?
 
 3. meta-heuristic algorithm pool
     - <span style="color:red">We'll be using the current set of our algorithm pool (GWO series, PSO, HHO)</span>
     - We can control the release time of specific algorithm (which mean it can only be used in specific time)
+    - sigle objectives?
 
 4. evaluation metric
     - Target function fitness value
@@ -46,8 +48,6 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 - Changing the release time for each meta-heuristic algorithm
 - Try another hyper-heuristic algorithm
 - Try out more functions (target function)
-- <span style="color:yellow">With/Without attention</span>
-- <span style="color:yellow">random hyper-param for hyper-heuristic</span>
 - other rule base
 
 ## <span style="color:red">GOALS</span>
@@ -59,5 +59,8 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
 3. Explore the impact of self-attention machanisms on the quality of decision-making
 
 ## Ideas (Write down your ideas here)
+
+- <span style="color:yellow">With/Without attention</span>
+- <span style="color:yellow">random hyper-param for hyper-heuristic</span>
 
 ## Questions
