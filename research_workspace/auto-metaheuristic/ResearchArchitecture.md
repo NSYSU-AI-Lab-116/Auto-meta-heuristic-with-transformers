@@ -31,9 +31,14 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
     - pre-measurement?
 
 3. meta-heuristic algorithm pool
-    - <span style="color:red">We'll be using the current set of our algorithm pool (GWO series, PSO, HHO)</span>
+    - **PSO (Particle Swarm Optimization)**
+    - **DE (Differential Evolution)**
+    - **GWO (Grey Wolf Optimizer)**
+    - **HHO (Harris Hawks Optimization)**
+    - **GA (Genetic Algorithm)**
+    - **SA (Simulated Annealing)**
+    - **Tabu Search** 
     - We can control the release time of specific algorithm (which mean it can only be used in specific time)
-    - sigle objectives?
 
 4. evaluation metric
     - Target function fitness value
