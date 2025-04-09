@@ -37,7 +37,7 @@ Using a meta-heuristic algorithm to select the best combination of meta-heurstic
     - **HHO (Harris Hawks Optimization)**
     - **GA (Genetic Algorithm)**
     - **SA (Simulated Annealing)**
-    - **Tabu Search** 
+    - **Tabu Search**
     - We can control the release time of specific algorithm (which mean it can only be used in specific time)
 
 4. evaluation metric
