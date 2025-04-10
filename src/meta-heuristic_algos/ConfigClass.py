@@ -11,6 +11,7 @@ from optimizers.ChOA import ChOACONTROL
 from optimizers.SCSO import SCSOCONTROL
 from optimizers.REINEDGWO import REINEDGWOCONTROL
 from optimizers.DE import DECONTROL
+from optimizers.GA import GACONTROL
 
 class Color:
     RED = '\033[31m'
@@ -35,7 +36,8 @@ class Configs:
         "HHO" :HHOCONTROL,
         "SCSO":SCSOCONTROL,
         "REINEDGWO": REINEDGWOCONTROL,
-        "DE": DECONTROL
+        "DE": DECONTROL,
+        "GA": GACONTROL
     }
     
 
