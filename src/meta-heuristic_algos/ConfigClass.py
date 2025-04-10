@@ -10,6 +10,7 @@ from optimizers.HHO import HHOCONTROL
 from optimizers.ChOA import ChOACONTROL
 from optimizers.SCSO import SCSOCONTROL
 from optimizers.REINEDGWO import REINEDGWOCONTROL
+from optimizers.DE import DECONTROL
 
 class Color:
     RED = '\033[31m'
@@ -24,16 +25,17 @@ class Color:
 class Configs:
     optimizers = {
         "EDGWO": EDGWOCONTROL,
-        #"GWO": GWOCONTROL,
-        #"CHGWOSCA": CHGWOSCACONTROL,
-        #"REEGWO": REEGWOCONTROL,
-        #"MSGWO": MSGWOCONTROL,
-        #"BES": BESCONTROL,
-        #"ChOA": ChOACONTROL,
-        #"PSO" :PSOCONTROL,
-        #"HHO" :HHOCONTROL,
-        #"SCSO":SCSOCONTROL,
-        #"REINEDGWO": REINEDGWOCONTROL
+        "GWO": GWOCONTROL,
+        "CHGWOSCA": CHGWOSCACONTROL,
+        "REEGWO": REEGWOCONTROL,
+        "MSGWO": MSGWOCONTROL,
+        "BES": BESCONTROL,
+        "ChOA": ChOACONTROL,
+        "PSO" :PSOCONTROL,
+        "HHO" :HHOCONTROL,
+        "SCSO":SCSOCONTROL,
+        "REINEDGWO": REINEDGWOCONTROL,
+        "DE": DECONTROL
     }
     
 
