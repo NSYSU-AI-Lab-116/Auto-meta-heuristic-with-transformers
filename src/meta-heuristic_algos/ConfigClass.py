@@ -13,6 +13,7 @@ from optimizers.REINEDGWO import REINEDGWOCONTROL
 from optimizers.DE import DECONTROL
 from optimizers.GA import GACONTROL
 from optimizers.SA import SACONTROL
+from optimizers.TABU import TSCONTROL
 
 class Color:
     RED = '\033[31m'
@@ -39,7 +40,8 @@ class Configs:
         #"REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,
         "GA": GACONTROL,
-        "SA": SACONTROL
+        "SA": SACONTROL,
+        "TABU": TSCONTROL
     }
     
 

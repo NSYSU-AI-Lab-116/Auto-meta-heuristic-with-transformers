@@ -29,12 +29,9 @@ class SA:
         # To generate neighbor solution
         neighbor = current_solution.copy()
         for i in range(self.dim):
-            # 隨機決定用哪種擾動，這邊 80% 機率用小步長，20% 機率用大步長
             if np.random.rand() < 0.8:
-                # 小幅擾動，可進一步乘上 (self.temp/self.init_temp) 當作動態調整
                 step = np.random.normal(0, 0.1 * (self.temp/self.temp))
             else:
-                # 大幅擾動，這裡直接用較大的標準差，可根據需求調整
                 step = np.random.normal(0, 1.0)
             neighbor[i] += step
         neighbor = np.clip(neighbor, self.lb, self.ub)
@@ -68,7 +65,7 @@ class SA:
 
 class SACONTROL:
     __name__ = "SA"
-    def __init__(self, MAX_ITER, Empty, FUNCTION, INIT_TEMP=1000, COOLING_RATE=0.95):
+    def __init__(self, MAX_ITER, EMPTY, FUNCTION, INIT_TEMP=1000, COOLING_RATE=0.95):
         self.MAX_ITER = MAX_ITER
         self.INIT_TEMP = INIT_TEMP
         self.COOLING_RATE = COOLING_RATE
