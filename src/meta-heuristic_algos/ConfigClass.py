@@ -12,6 +12,7 @@ from optimizers.SCSO import SCSOCONTROL
 from optimizers.REINEDGWO import REINEDGWOCONTROL
 from optimizers.DE import DECONTROL
 from optimizers.GA import GACONTROL
+from optimizers.SA import SACONTROL
 
 class Color:
     RED = '\033[31m'
@@ -25,19 +26,20 @@ class Color:
 
 class Configs:
     optimizers = {
-        "EDGWO": EDGWOCONTROL,
-        "GWO": GWOCONTROL,
-        "CHGWOSCA": CHGWOSCACONTROL,
-        "REEGWO": REEGWOCONTROL,
-        "MSGWO": MSGWOCONTROL,
-        "BES": BESCONTROL,
-        "ChOA": ChOACONTROL,
-        "PSO" :PSOCONTROL,
-        "HHO" :HHOCONTROL,
-        "SCSO":SCSOCONTROL,
-        "REINEDGWO": REINEDGWOCONTROL,
+        #"EDGWO": EDGWOCONTROL,
+        #"GWO": GWOCONTROL,
+        #"CHGWOSCA": CHGWOSCACONTROL,
+        #"REEGWO": REEGWOCONTROL,
+        #"MSGWO": MSGWOCONTROL,
+        #"BES": BESCONTROL,
+        #"ChOA": ChOACONTROL,
+        #"PSO" :PSOCONTROL,
+        #"HHO" :HHOCONTROL,
+        #"SCSO":SCSOCONTROL,
+        #"REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,
-        "GA": GACONTROL
+        "GA": GACONTROL,
+        "SA": SACONTROL
     }
     
 
