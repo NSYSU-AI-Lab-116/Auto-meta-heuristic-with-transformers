@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from DataSet import DataSet
 
 class DE:
-    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, F=0.5, CR=0.9):
+    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, F=0.5, CR=0.9, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -19,12 +19,16 @@ class DE:
             self.ub = np.append(self.ub, DataSet.NN_K)
             self.lb = np.append(self.lb, 1)
             self.dim += 1
-        
-        self.population = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
-        self.fitness = np.array([np.inf] * self.num_par)
 
+        if init_population is None:
+            self.population = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
+        else:
+            self.population = init_population
+        
+        self.fitness = np.array([np.inf] * self.num_par)
         self.gbest = None
         self.gbest_score = np.inf
+        
     def optimize(self):
         convergence_curve = []
 
@@ -86,9 +90,9 @@ class DECONTROL:
         self.F = F
         self.CR = CR
 
-    def Start(self):
+    def Start(self, init_population=None):
         de = DE(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type, F=self.F, CR=self.CR)
+                num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type, F=self.F, CR=self.CR, init_population=init_population)
         best_position, best_value, curve, population = de.optimize()
 
         if self.f_type == "d":
