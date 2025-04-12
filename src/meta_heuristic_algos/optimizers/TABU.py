@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 class TS:
     def __init__(self, obj_function, dim, lb, ub, max_iter, f_type, tabu_list_size=5, num_neighbors=10, tolerance=1e-4, init_population=None):
@@ -127,7 +128,7 @@ class TSCONTROL:
             return (updated_population, np.log10(curve))
 
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
+    """ funcs_by_year = DataSet.funcs_years
 
     MAX_ITER = 500
     TABU_SIZE = 5
@@ -153,4 +154,4 @@ if __name__ == '__main__':
             plt.xlabel("Iterations")
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"TS Convergence {year}-{func_name}-{DIM}D")
-            plt.show() 
+            plt.show()  """

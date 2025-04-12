@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 def logistics_chaotic_map(dim, iteration=10, value=1):
     x0 = np.zeros(dim) + 0.7
@@ -121,7 +122,7 @@ class ChOACONTROL:
 
 
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
+    """ funcs_by_year = DataSet.funcs_years
     DIM = 10
     MAX_ITER = 500
     NUM_CHIMPS = 30
@@ -147,4 +148,4 @@ if __name__ == '__main__':
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"ChOA Convergence {year}-{func_name}-{DIM}D")
             plt.legend()
-            plt.show()
+            plt.show() """

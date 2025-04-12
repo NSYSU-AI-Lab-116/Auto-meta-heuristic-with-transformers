@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 # 定義 Sand Cat Swarm Optimization (SCSO)
 class SCSO:
@@ -85,7 +86,7 @@ class SCSOCONTROL:
 
 
 if __name__ == '__main__':
-    funcs_by_year = {
+    """ funcs_by_year = {
         "2021": ["F3", "F6", "F8", "F10"],
         "2022": ["F4", "F7", "F8", "F9"]
     }
@@ -115,3 +116,4 @@ if __name__ == '__main__':
             plt.title(f"SCSO Convergence {year}-{func_name}-{DIM}D")
             plt.legend()
             plt.show()
+ """

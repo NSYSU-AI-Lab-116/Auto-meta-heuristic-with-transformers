@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 class REIN_EDGWO:
     def __init__(self, obj_function, dim, lb, ub, num_wolves, MAX_ITER, f_type):
@@ -126,7 +127,7 @@ class REINEDGWOCONTROL:
             return (wolves, np.log10(curve))
     
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
+    """ funcs_by_year = DataSet.funcs_years
     DIM = 10
     MAX_ITER = 500
     NUM_WOLVES = 30
@@ -160,4 +161,4 @@ if __name__ == '__main__':
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"REIN-EDGWO Convergence {year}-{func_name}-{DIM}D")
             plt.legend()
-            plt.show()
+            plt.show() """

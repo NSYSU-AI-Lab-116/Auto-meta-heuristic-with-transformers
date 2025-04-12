@@ -2,7 +2,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 def levy_flight(dim):
     beta = 1.5
@@ -108,31 +109,4 @@ class HHOCONTROL:
             return (hawks, np.log10(curve))
 
 if __name__ == '__main__':
-
-    funcs_by_year = DataSet.funcs_years
-    
-    MAX_ITER = 500
-    NUM_HAWKS = 30
-    DIM = 10
-    
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year,func_name,DIM)
-            UB = function.ub
-            LB = function.lb
-            f = function.func # 取得函式
-            # 計算函式值 f([多個維度組成的陣列])   -> 例如 f([x,y])
-            
-            # 執行 HHO
-            hho = HHO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_hawks=NUM_HAWKS, max_iter=MAX_ITER)
-            best_position, best_value, curve = hho.optimize()
-            
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-            
-            # 繪製收斂曲線
-            plt.plot(np.log10(curve))
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"HHO Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
+    pass

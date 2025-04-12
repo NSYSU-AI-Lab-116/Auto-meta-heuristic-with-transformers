@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 
 # 定義 EDGWO
@@ -115,7 +115,7 @@ class EDGWOCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self):
         edgwo = EDGWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                     num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type)
         best_position, best_value, curve, wolves = edgwo.optimize()
@@ -130,63 +130,4 @@ class EDGWOCONTROL:
 
 
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
-    DIM = 10
-    MAX_ITER = 500
-    NUM_WOLVES = 30
-
-    # CEC 函式呼叫方法  
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year,func_name,DIM) # 取得CEC Year年度，維度為 DIM 之 F1 函式的資訊
-            UB = function.ub
-            LB = function.lb
-            dim= function.dim
-            f = function.func # 取得函式
-            # 計算函式值 f([多個維度組成的陣列])   -> 例如 f([x,y])
-
-
-
-            # 設定參數
-            
-            # 執行 GWO
-            edgwo = EDGWO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_wolves=NUM_WOLVES, max_iter=MAX_ITER)
-            best_position, best_value, curve, _ = edgwo.optimize()
-
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-
-            # 繪製收斂曲線
-            plt.figure(figsize=(8, 6))
-            plt.plot(np.log10(curve), label=f"CEC {year} {func_name}")
-            plt.xticks([i for i in range(0, MAX_ITER + 1, 50)])
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"EDGWO Convergence {year}-{func_name}-{DIM}D")
-            plt.legend()
-            plt.show()
-
-
-            """ if(dim!=2):
-                print(f"Dimension is {dim}, skipping 3D plot for CEC {year} {func_name}")
-                continue
-
-            X = np.linspace(LB[0], UB[0], 100)
-            Y = np.linspace(LB[1], UB[1], 100)
-            X, Y = np.meshgrid(X, Y)
-            # Z = np.array([f([X[i, j], Y[i, j]]) for i in range(X.shape[0]) for j in range(X.shape[1])]).reshape(X.shape)
-            Z = np.vectorize(f)(X, Y)
-
-            fig = plt.figure(figsize=(8, 6))
-            ax = fig.add_subplot(111, projection='3d')
-            ax.plot_surface(X, Y, Z, cmap='coolwarm', alpha=0.7)
-
-            # 畫出狼群搜索過程
-            #wolves_path = np.array(gwo.wolves)
-            #for i in range(len(wolves_path)):
-            #    ax.scatter(wolves_path[i][:, 0], wolves_path[i][:, 1], rastrigin(wolves_path[i].T), color='black', marker='o')
-            ax.set_xlabel("X")
-            ax.set_ylabel("Y")
-            ax.set_zlabel("Fitness")
-            plt.title(f"GWO Searching Path for CEC {year} {func_name}")
-            plt.show() """
+    pass

@@ -1,7 +1,6 @@
 import opfunu as of
 import scipy.io as sio
 import numpy as np
-import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier as KNN
 from sklearn.model_selection import train_test_split
 
@@ -180,9 +179,9 @@ class DMFUNC:
 
         knn = KNN(n_neighbors=k)
         knn.fit(X_train_weighted, self.Y_train)
-        
+
         accuracy = knn.score(X_test_weighted, self.Y_test)
-        return 1/accuracy  
+        return 1/accuracy
 
 
 

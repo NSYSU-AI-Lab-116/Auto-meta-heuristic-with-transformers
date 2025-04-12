@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 class SA:
     def __init__(self, obj_function, dim, lb, ub, max_iter, f_type, init_temp=1000, cooling_rate=0.95, init_population=None):
@@ -102,7 +103,7 @@ class SACONTROL:
             return (updated_population, np.log10(curve))
 
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
+    """ funcs_by_year = DataSet.funcs_years
 
     MAX_ITER = 500
     INIT_TEMP = 1000     
@@ -128,4 +129,4 @@ if __name__ == '__main__':
             plt.xlabel("Generations")
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"SA Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
+            plt.show() """

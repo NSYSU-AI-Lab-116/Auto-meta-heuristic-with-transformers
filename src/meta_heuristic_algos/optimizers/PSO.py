@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 class PSO:
     def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, init_population=None):
@@ -93,8 +94,7 @@ class PSOCONTROL:
 
 
 if __name__ == '__main__':
-
-    funcs_by_year = DataSet.funcs_years
+    """ funcs_by_year = DataSet.funcs_years
 
     # 設定參數
     MAX_ITER = 500
@@ -124,3 +124,4 @@ if __name__ == '__main__':
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"PSO Convergence {year}-{func_name}-{DIM}D")
             plt.show()
+ """

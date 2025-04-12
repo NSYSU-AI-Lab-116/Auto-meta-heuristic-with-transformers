@@ -1,19 +1,22 @@
+"""Model for Differential Evolution (DE) algorithm."""
 import numpy as np
-import matplotlib.pyplot as plt
-
-from DataSet import DataSet
+from src.meta_heuristic_algos.Config import Configs
+DataSet = Configs.DataSet
 
 class DE:
-    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, F=0.5, CR=0.9, init_population=None):
+    """ Differential Evolution algorithm for optimization."""
+    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter,
+                 f_type, factor=0.5, cross_rate=0.9, init_population=None):
+
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
         self.ub = np.array(ub)
         self.num_par = num_par
-        self.max_iter = max_iter
+        self.max_iter = int(max_iter)
         self.f_type = f_type
-        self.F = F      # scaling factor
-        self.CR = CR    # cross rate
+        self.factor = factor      # scaling factor
+        self.cross_rate = cross_rate    # cross rate
 
         if self.f_type == "d":
             self.ub = np.append(self.ub, DataSet.NN_K)
@@ -24,36 +27,37 @@ class DE:
             self.population = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
         else:
             self.population = init_population
-        
+
         self.fitness = np.array([np.inf] * self.num_par)
         self.gbest = None
         self.gbest_score = np.inf
-        
+
     def optimize(self):
+        """ Perform the optimization process. """
         convergence_curve = []
 
         # initializationn
         for i in range(self.num_par):
-            self.fitness[i] = self.obj_function(self.population[i])
+            self.fitness[i] = self.obj_function(self.population[i],i)
             if self.fitness[i] < self.gbest_score:
                 self.gbest_score = self.fitness[i]
                 self.gbest = self.population[i].copy()
-        
+
         # iteration
-        for t in range(self.max_iter):
+        for _ in range(self.max_iter):
             for i in range(self.num_par):
-                # randomly select 
+                # randomly select
                 idxs = list(range(self.num_par))
                 idxs.remove(i)
                 a, b, c = self.population[np.random.choice(idxs, 3, replace=False)]
 
-                donor = a + self.F*(b - c)
+                donor = a + self.factor*(b - c)
 
                 # compute trial solution (by crossing)
                 trial = np.empty(self.dim)
                 j_rand = np.random.randint(self.dim)
                 for j in range(self.dim):
-                    if j == j_rand or np.random.rand() < self.CR:
+                    if j == j_rand or np.random.rand() < self.cross_rate:
                         trial[j] = donor[j]
                     else:
                         trial[j] = self.population[i][j]
@@ -64,8 +68,8 @@ class DE:
                     trial[-1] = np.clip(trial[-1], 1, DataSet.NN_K)
                 else:
                     trial = np.clip(trial, self.lb, self.ub)
-                
-                trial_fitness = self.obj_function(trial)
+
+                trial_fitness = self.obj_function(trial,i)
                 # verify trial solution
                 if trial_fitness < self.fitness[i]:
                     self.population[i] = trial
@@ -76,23 +80,25 @@ class DE:
 
             convergence_curve.append(self.gbest_score)
         return self.gbest, self.gbest_score, convergence_curve, self.population
-    
-class DECONTROL:
-    __name__="DE"  
-    def __init__(self, MAX_ITER, NUM_PARTICLES, FUNCTION, F = 0.5, CR = 0.9):
-        self.MAX_ITER = MAX_ITER
-        self.NUM_PARTICLES = NUM_PARTICLES
-        self.UB = FUNCTION.ub
-        self.LB = FUNCTION.lb
-        self.DIM = FUNCTION.dim
-        self.f = FUNCTION.func
-        self.f_type = FUNCTION.f_type
-        self.F = F
-        self.CR = CR
 
-    def Start(self, init_population=None):
-        de = DE(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type, F=self.F, CR=self.CR, init_population=init_population)
+class DECONTROL:
+    """ Control class for Differential Evolution algorithm."""
+    __name__="DE"
+    def __init__(self, max_iter, num_individual, function, factor = 0.5, cross_rate = 0.9):
+        self.max_iter = max_iter
+        self.num_individual = num_individual
+        self.ub = function.ub
+        self.lb = function.lb
+        self.dim = function.dim
+        self.f = function.func
+        self.f_type = function.f_type
+        self.factor = factor
+        self.cross_rate = cross_rate
+
+    def start(self, init_population=None):
+        """ Start the DE optimization process. """
+        de = DE(obj_function=self.f, dim=self.dim, lb=self.lb, ub=self.ub,
+                num_par=self.num_individual, max_iter=self.max_iter, f_type=self.f_type, factor=self.factor, cross_rate=self.cross_rate, init_population=init_population)
         best_position, best_value, curve, population = de.optimize()
 
         if self.f_type == "d":
@@ -101,27 +107,4 @@ class DECONTROL:
             return (population, np.log10(curve))
 
 if __name__ == '__main__':
-    funcs_by_year = DataSet.funcs_years
-
-    MAX_ITER = 500
-    NUM_PARTICLES = 30
-    DIM = 10
-
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year, func_name, DIM)
-            UB = function.ub
-            LB = function.lb
-            f = function.func
-
-            de = DE(obj_function=f, dim=DIM, lb=LB, ub=UB, num_par=NUM_PARTICLES, max_iter=MAX_ITER, f_type=function.f_type)
-            best_position, best_value, curve, population = de.optimize()
-
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-
-            plt.plot(np.log10(curve))
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"DE Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
+    pass
