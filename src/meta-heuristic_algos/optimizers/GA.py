@@ -4,7 +4,7 @@ import matplotlib as plt
 from DataSet import DataSet
 
 class GA:
-    def __init__(self, obj_function, dim, lb, ub, pop_size, max_iter, f_type, mutation_rate=0.01):
+    def __init__(self, obj_function, dim, lb, ub, pop_size, max_iter, f_type, mutation_rate=0.01, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -18,9 +18,12 @@ class GA:
             self.ub = np.append(self.ub, DataSet.NN_K)
             self.lb = np.append(self.lb, 1)
             self.dim += 1
-        
-        # initialization
-        self.population = np.random.uniform(self.lb, self.ub, (self.pop_size, self.dim))
+
+        if init_population is None:
+            self.population = np.random.uniform(self.lb, self.ub, (self.pop_size, self.dim))
+        else:
+            self.population = init_population
+
         self.fitness = np.array([self.obj_function(idx) for idx in self.population])
         best_idx = np.argmin(self.fitness)
         self.gbest = self.population[best_idx].copy()
@@ -93,10 +96,10 @@ class GACONTROL:
         self.f_type = FUNCTION.f_type
         self.mutation_rate = mutation_rate
     
-    def Start(self):
+    def Start(self, init_population=None):
         ga = GA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                 pop_size=self.POP_SIZE, max_iter=self.MAX_ITER, f_type=self.f_type,
-                mutation_rate=self.mutation_rate)
+                mutation_rate=self.mutation_rate, init_population=init_population)
         best_position, best_value, curve, population = ga.optimize()
         
         if self.f_type == "d":

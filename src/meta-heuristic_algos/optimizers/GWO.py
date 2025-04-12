@@ -6,22 +6,26 @@ from DataSet import DataSet
 
 # 定義 Grey Wolf Optimization (GWO)
 class GWO:
-    def __init__(self, obj_function, dim, lb, ub, num_wolves, max_iter, f_type):
-        self.obj_function = obj_function  # 目標函數
-        self.dim = dim                    # 變數維度
-        self.lb = np.array(lb)            # 下界
-        self.ub = np.array(ub)            # 上界
-        self.num_wolves = num_wolves      # 狼群數量
-        self.max_iter = max_iter          # 最大迭代次數
-        self.f_type = f_type              # 連續/離散問題
+    def __init__(self, obj_function, dim, lb, ub, num_wolves, max_iter, f_type, init_population=None):
+        self.obj_function = obj_function
+        self.dim = dim
+        self.lb = np.array(lb)
+        self.ub = np.array(ub)
+        self.num_wolves = num_wolves
+        self.max_iter = max_iter
+        self.f_type = f_type
 
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
-            self.dim+=1
-        # 初始化狼群位置
-        self.wolves = np.random.uniform(self.lb, self.ub, (self.num_wolves, self.dim))
-        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim)
+            self.dim += 1
+
+        if init_population is None:
+            self.wolves = np.random.uniform(self.lb, self.ub, (self.num_wolves, self.dim))
+        else:
+            self.wolves = init_population
+
+        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
 
     def optimize(self):
@@ -77,24 +81,21 @@ class GWO:
 
 class GWOCONTROL:
     __name__ = "GWO"
-    def __init__(self,MAX_ITER, NUM_WOLVES, FUNCTION):
+    def __init__(self, MAX_ITER, NUM_WOLVES, FUNCTION):
         self.MAX_ITER = MAX_ITER
         self.NUM_WOLVES = NUM_WOLVES
-
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
-        self.DIM= FUNCTION.dim
+        self.DIM = FUNCTION.dim
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def Start(self, init_population=None):
         gwo = GWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type)
+                  num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type,
+                  init_population=init_population)
         best_position, best_value, curve, wolves = gwo.optimize()
         
-        """ print("Best solution found:", best_position)
-        print("Best fitness:", best_value) """
-
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:

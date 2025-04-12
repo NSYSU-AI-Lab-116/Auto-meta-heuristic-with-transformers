@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from DataSet import DataSet
 
 class PSO:
-    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -16,20 +16,19 @@ class PSO:
         self.c1 = 2
         self.c2 = 2
 
-
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
-            self.dim+=1
-        # 初始化速度/位置
-        self.particles = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
-        self.velocities = np.random.uniform(-abs(self.ub - self.lb), abs(self.ub - self.lb), (self.num_par, self.dim))
+            self.dim += 1
 
-        # 個體最佳解
+        if init_population is None:
+            self.particles = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
+        else:
+            self.particles = init_population
+
+        self.velocities = np.random.uniform(-abs(self.ub - self.lb), abs(self.ub - self.lb), (self.num_par, self.dim))
         self.pbest = self.particles.copy()
         self.pbest_scores = np.array([np.inf] * self.num_par)
-
-        # 全局最佳解
         self.gbest = np.random.uniform(self.lb, self.ub, self.dim)
         self.gbest_score = np.inf
     
@@ -73,20 +72,18 @@ class PSOCONTROL:
     def __init__(self,MAX_ITER, NUM_PARTICLES,  FUNCTION):
         self.MAX_ITER = MAX_ITER
         self.NUM_PARTICLES = NUM_PARTICLES
-
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
         self.DIM= FUNCTION.dim
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def Start(self, init_population=None):
         pso = PSO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type)
+                  num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type,
+                  init_population=init_population)
         best_position, best_value, curve, particles = pso.optimize()
-        
-        """ print("Best solution found:", best_position)
-        print("Best fitness:", best_value) """
+
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:

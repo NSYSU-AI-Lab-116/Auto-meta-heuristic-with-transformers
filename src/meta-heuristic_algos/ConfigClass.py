@@ -28,14 +28,14 @@ class Color:
 class Configs:
     optimizers = {
         #"EDGWO": EDGWOCONTROL,
-        #"GWO": GWOCONTROL,
+        "GWO": GWOCONTROL,
         #"CHGWOSCA": CHGWOSCACONTROL,
         #"REEGWO": REEGWOCONTROL,
         #"MSGWO": MSGWOCONTROL,
         #"BES": BESCONTROL,
         #"ChOA": ChOACONTROL,
-        #"PSO" :PSOCONTROL,
-        #"HHO" :HHOCONTROL,
+        "PSO" :PSOCONTROL,
+        "HHO" :HHOCONTROL,
         #"SCSO":SCSOCONTROL,
         #"REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,

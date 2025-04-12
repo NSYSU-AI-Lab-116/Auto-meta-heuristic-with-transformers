@@ -14,7 +14,7 @@ def levy_flight(dim):
     return step
 
 class HHO:
-    def __init__(self, obj_function, dim, lb, ub, num_hawks, max_iter, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_hawks, max_iter, f_type, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -27,9 +27,12 @@ class HHO:
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
             self.dim += 1
-        
-        # 初始化獵鷹位置
-        self.hawks = np.random.uniform(self.lb, self.ub, (self.num_hawks, self.dim))
+
+        if init_population is None:
+            self.hawks = np.random.uniform(self.lb, self.ub, (self.num_hawks, self.dim))
+        else:
+            self.hawks = init_population
+
         self.best_position = None
         self.best_score = np.inf
     
@@ -87,16 +90,16 @@ class HHOCONTROL:
     def __init__(self, MAX_ITER, NUM_HAWKS, FUNCTION):
         self.MAX_ITER = MAX_ITER
         self.NUM_HAWKS = NUM_HAWKS
-        
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
         self.DIM = FUNCTION.dim
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
     
-    def Start(self):
+    def Start(self, init_population=None):
         hho = HHO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                  num_hawks=self.NUM_HAWKS, max_iter=self.MAX_ITER, f_type=self.f_type)
+                  num_hawks=self.NUM_HAWKS, max_iter=self.MAX_ITER, f_type=self.f_type,
+                  init_population=init_population)
         best_position, best_value, curve, hawks = hho.optimize()
         
         if self.f_type == "d":
