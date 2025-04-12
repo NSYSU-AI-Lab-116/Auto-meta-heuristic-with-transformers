@@ -1,0 +1,131 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{amsmath, amsfonts}
+\usepackage{graphicx}
+\usepackage{cite}
+
+
+\begin{document}
+
+\title{A Hyper-Heuristic System for Automated Meta-Heuristic Selection in Single-Objective Optimization}
+
+\author{
+\IEEEauthorblockN{Your Name}
+\IEEEauthorblockA{
+Department of XXXX \\
+University Name \\
+Email: your@email.com}
+}
+% The paper headers
+\markboth{IEEE	, ~Vol.~X, No.~X, ~XXXX}%
+{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for
+  Journals}
+
+\maketitle
+
+\begin{abstract}
+    This paper proposes a hyper-heuristic system for automating the selection of meta-heuristic algorithms in single-objective optimization problems. We employ Differential Evolution (DE) as a hyper-heuristic to explore optimal algorithm combinations from a predefined pool, including PSO, GWO, HHO, GA, SA, and TS. 
+    
+    %
+   Experimental results show that the proposed hyper-heuristic consistently outperforms individual meta-heuristics in convergence rate and final fitness. On CEC2020 and CEC2022, it further demonstrates strong adaptability by dynamically adjusting algorithm combinations across optimization phases. In conclusion, this research offers a direction for scalable and intelligent optimization, laying the groundwork for future learning-based hyper-heuristic systems.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+    hyper-heuristic, meta-heuristic algorithm, automated optimization
+\end{IEEEkeywords}
+
+\section{Introduction}
+    With the rapid advancement of optimization technology and the increasing complexity of 
+    real-world problems, there is a growing demand for adaptive and intelligent optimization strategies. 
+    Meta-heuristic algorithms have become increasingly popular for solving complex optimization problems 
+    due to their flexibility and generality. However, their performance often relies heavily on 
+    problem-specific tuning and prior knowledge, and may vary significantly across different problem types. 
+    This raises the challenge of algorithm selection, where the most suitable algorithm 
+    (or combination of algorithms) must be chosen based on the problem’s characteristics.
+    
+    To address this, hyper-heuristic systems have emerged as a promising solution. 
+    These systems aim to automate the process of selecting and configuring meta-heuristics, 
+    reducing human intervention and enhancing adaptability. 
+    
+    In this paper, we present a hyper-heuristic system aimed at automating the selection 
+    of meta-heuristic algorithms for solving single-objective optimization problems. 
+    The core idea involves using a Differential Evolution (DE) algorithm as a hyper-heuristic 
+    to identify the optimal combination of meta-heuristics from a pre-defined algorithm pool, 
+    which includes PSO, DE, GWO, HHO, GA, SA, and TS. The system takes labeled function descriptors 
+    (e.g., function ID, dimension, and number of terms) as pseudo input and outputs an optimized list 
+    of algorithm configurations.
+    
+    Benchmark tests are conducted on a series of single-objective functions, 
+    including CEC benchmark suites from 2019 to 2023. Several evaluation metrics are considered, 
+    such as objective fitness value, convergence speed, stability, rate, and consistency. 
+    Additional criteria include explainable and consistent decision-making.
+
+    Experimental results showed that the proposed hyper-heuristic system consistently outperformed 
+    individual meta-heuristic algorithms in terms of convergence rate and final fitness values 
+    across most benchmark functions. Particularly, on CEC2020 and CEC2022 benchmark sets, 
+    the DE-based hyper-heuristic demonstrated superior adaptability by dynamically adjusting the 
+    combination of algorithms during different phases of optimization. 
+    The incorporation of algorithm release-time control further improved performance by 
+    leveraging the strengths of specific meta-heuristics at appropriate stages. 
+    Additionally, the decision-making process exhibited promising levels of consistency, 
+    and preliminary analysis indicated the potential for explainable behavior patterns 
+    when certain function characteristics were present.
+
+\section{Related Works}
+    Numerous studies have focused on developing adaptive or ensemble-based meta-heuristic frameworks. 
+    Previous research has explored algorithm portfolios, offline and online selection strategies, 
+    as well as machine learning-based meta-algorithm selection.
+
+    Hyper-heuristics, originally proposed for combinatorial optimization, have gradually been extended to continuous domains. 
+    Recent approaches include reinforcement learning-based selection, rule-based decision systems, and genetic programming. 
+    However, few works explore the potential of combining these ideas with dynamic control mechanisms 
+    and modern learning models like transformers.
+
+\section{Research Methods}
+    The proposed system is composed of the following components:
+
+\subsection{Problem Formulation}
+    We focus on single-objective optimization using benchmark functions such as the CEC 2019–2023 test suites. 
+    Each problem is represented by its function label, dimensionality, and number of terms.
+
+\subsection{Hyper-Heuristic Algorithm}
+    We adopt Differential Evolution (DE) as the primary hyper-heuristic controller. 
+    Its role is to evolve a population of meta-heuristic configurations, 
+    selecting the most suitable algorithms from a predefined pool.
+
+\subsection{Meta-Heuristic Pool}
+    The algorithm pool includes: PSO, DE, GWO, HHO, GA, SA, and TS. 
+    Each algorithm can be activated at specific stages during optimization, 
+    allowing controlled release and greater flexibility.
+
+\subsection{Evaluation Metrics}
+    Optimization performance is evaluated based on fitness value, convergence speed, 
+    convergence stability, and consistency. Qualitative analysis is also conducted on decision explainability.
+
+\subsection{Implementation}
+    The framework is implemented using Python with support from libraries such as \texttt{opfunu}, \texttt{matplotlib}, and \texttt{tqdm}.
+
+\section{Conclusion}
+    This paper introduced a DE-based hyper-heuristic system for adaptive selection 
+    of meta-heuristic algorithms in single-objective optimization. 
+    Experimental results demonstrate that the proposed approach outperforms individual meta-heuristics 
+    in terms of convergence and adaptability.
+    Future work will investigate integration with transformer-based models 
+    to enhance decision-making quality and enable large-scale automated optimization.
+
+\section*{References}
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{99}
+
+\bibitem{hyper}
+
+\bibitem{cec2020}
+ 
+\bibitem{de}
+    R. Storn and K. Price, “Differential evolution – a simple and efficient heuristic for global optimization over continuous spaces,” *Journal of Global Optimization*, vol. 11, no. 4, pp. 341–359, 1997.
+
+% Add more as needed
+
+\end{thebibliography}
+
+\end{document}
