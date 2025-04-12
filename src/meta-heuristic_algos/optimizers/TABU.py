@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from DataSet import DataSet
 
 class TS:
-    def __init__(self, obj_function, dim, lb, ub, max_iter, f_type, tabu_list_size=5, num_neighbors=10, tolerance=1e-4):
+    def __init__(self, obj_function, dim, lb, ub, max_iter, f_type, tabu_list_size=5, num_neighbors=10, tolerance=1e-4, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -21,7 +21,18 @@ class TS:
             self.dim += 1
 
         # initialization
-        self.current = np.random.uniform(self.lb, self.ub, self.dim)
+        if init_population is None:
+            self.current = np.random.uniform(self.lb, self.ub, self.dim)
+            self.population = None
+            self.candidate_index = None
+        else:
+            pop = np.array(init_population)
+            fitnesses = [self.obj_function(ind) for ind in pop]
+            best_idx = np.argmin(fitnesses)
+            self.current = pop[best_idx].copy()
+            self.candidate_index = best_idx
+            self.population = pop
+
         self.current_fitness = self.obj_function(self.current)
         self.best = self.current.copy()
         self.best_fitness = self.current_fitness
@@ -86,7 +97,11 @@ class TS:
 
             convergence_curve.append(self.best_fitness)
 
-        return self.best, self.best_fitness, convergence_curve, self.current
+        if self.population is not None and self.candidate_index is not None:
+            self.population[self.candidate_index] = self.best.copy()
+            return self.best, self.best_fitness, convergence_curve, self.population
+        else:
+            return self.best, self.best_fitness, convergence_curve, self.current
 
 class TSCONTROL:
     __name__ = "TS"
@@ -101,15 +116,15 @@ class TSCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def Start(self, init_population=None):
         ts = TS(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB,
                 max_iter=self.MAX_ITER, f_type=self.f_type,
-                tabu_list_size=self.TABU_SIZE, num_neighbors=self.NUM_NEIGHBORS, tolerance=self.TOLERANCE)
-        best_position, best_value, curve, final_solution = ts.optimize()
+                tabu_list_size=self.TABU_SIZE, num_neighbors=self.NUM_NEIGHBORS, tolerance=self.TOLERANCE, init_population=init_population)
+        best_position, best_value, curve, updated_population = ts.optimize()
         if self.f_type == "d":
-            return (final_solution, np.array(curve))
+            return (updated_population, np.array(curve))
         else:
-            return (final_solution, np.log10(curve))
+            return (updated_population, np.log10(curve))
 
 if __name__ == '__main__':
     funcs_by_year = DataSet.funcs_years
@@ -129,7 +144,7 @@ if __name__ == '__main__':
 
             ts = TS(obj_function=f, dim=DIM, lb=LB, ub=UB, max_iter=MAX_ITER,
                     f_type=function.f_type, tabu_list_size=TABU_SIZE, num_neighbors=NUM_NEIGHBORS, tolerance=TOLERANCE)
-            best_position, best_value, curve, final_solution = ts.optimize()
+            best_position, best_value, curve, updated_population = ts.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
             print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
