@@ -20,6 +20,7 @@ from optimizers.TABU import TSCONTROL """
 import opfunu as of
 class Configs:
     """ This class is the main configuration of the project"""
+    executer_num = 5
     class Color:
         """stores the color codes for the console"""
         RED = '\033[31m'
@@ -30,40 +31,6 @@ class Configs:
         CYAN = '\033[36m'
         WHITE = '\033[37m'
         RESET = '\033[0m'
-
-    """  class Optimizers:
-        This lists all the metaheuristic algorithms
-        metaheuristic_list = {
-            #"EDGWO": EDGWOCONTROL,
-            #"GWO": GWOCONTROL,
-            #"CHGWOSCA": CHGWOSCACONTROL,
-            #"REEGWO": REEGWOCONTROL,
-            #"MSGWO": MSGWOCONTROL,
-            #"BES": BESCONTROL,
-            #"ChOA": ChOACONTROL,
-            #"PSO" :PSOCONTROL,
-            #"HHO" :HHOCONTROL,
-            #"SCSO":SCSOCONTROL,
-            #"REINEDGWO": REINEDGWOCONTROL,
-            "DE": DECONTROL,
-            #"GA": GACONTROL,
-            #"SA": SACONTROL,
-            #"TABU": TSCONTROL
-        } """
-
-    """ class HyperParameters :
-        This stores the configs for the hyperheuristic algorithm
-        heuristic = DECONTROL
-        Parameters = {
-            "max_iter": 500,
-            "epoch": 10,
-            "dim": 2,
-            "num_individual": 10,
-            "num_param_each": 2,
-            "ub": [10,10]*10,
-            "lb": [0,0]*10,
-        } """
-
 
     class DataSet:
         """        This class handle the dataset """
@@ -104,7 +71,6 @@ class Configs:
                     if len(year_dict)>0:
                         cec_dict.update({year[-4:]:year_dict})
             return cec_dict
-
 
     class CECFUNC:
         """ ths clas handle the function get of the Opfunu library"""

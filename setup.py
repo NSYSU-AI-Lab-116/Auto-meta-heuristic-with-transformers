@@ -1,3 +1,4 @@
+"""run this file to install the loacl package (If you encountering any local module issue)"""
 from setuptools import setup, find_packages
 
 setup(

@@ -1,19 +1,19 @@
-
-from optimizers.EDGWO import EDGWOCONTROL
-from optimizers.GWO import GWOCONTROL
-from optimizers.CHGWOSCA import CHGWOSCACONTROL
-from optimizers.REEGWO import REEGWOCONTROL
-from optimizers.MSGWO import MSGWOCONTROL
-from optimizers.PSO import PSOCONTROL
-from optimizers.BES import BESCONTROL
-from optimizers.HHO import HHOCONTROL
-from optimizers.ChOA import ChOACONTROL
-from optimizers.SCSO import SCSOCONTROL
-from optimizers.REINEDGWO import REINEDGWOCONTROL
-from optimizers.DE import DECONTROL
-from optimizers.GA import GACONTROL
-from optimizers.SA import SACONTROL
-from optimizers.TABU import TSCONTROL
+""" optimizer configuration file"""
+from src.meta_heuristic_algos.algos.EDGWO import EDGWOCONTROL
+from src.meta_heuristic_algos.algos.GWO import GWOCONTROL
+from src.meta_heuristic_algos.algos.CHGWOSCA import CHGWOSCACONTROL
+from src.meta_heuristic_algos.algos.REEGWO import REEGWOCONTROL
+from src.meta_heuristic_algos.algos.MSGWO import MSGWOCONTROL
+from src.meta_heuristic_algos.algos.PSO import PSOCONTROL
+from src.meta_heuristic_algos.algos.BES import BESCONTROL
+from src.meta_heuristic_algos.algos.HHO import HHOCONTROL
+from src.meta_heuristic_algos.algos.ChOA import ChOACONTROL
+from src.meta_heuristic_algos.algos.SCSO import SCSOCONTROL
+from src.meta_heuristic_algos.algos.REINEDGWO import REINEDGWOCONTROL
+from src.meta_heuristic_algos.algos.DE import DECONTROL
+from src.meta_heuristic_algos.algos.GA import GACONTROL
+from src.meta_heuristic_algos.algos.SA import SACONTROL
+from src.meta_heuristic_algos.algos.TABU import TSCONTROL
 
 class Optimizers:
     """ This class stores all the metaheuristic algorithms"""
@@ -36,8 +36,10 @@ class Optimizers:
     }
 
 class HyperParameters :
-    """ This stores the configs for the hyperheuristic algorithm"""
-    heuristic = DECONTROL
+    """ This stores the configs for the heuristic algorithm"""
+    heuristic = DECONTROL  #Hyperheuristic algorithm
+    
+    # heurictic and hyperheuristic parameters
     Parameters = {
         "max_iter": 500,
         "epoch": 10,

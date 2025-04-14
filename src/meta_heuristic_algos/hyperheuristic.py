@@ -1,23 +1,23 @@
 """This script is the main script of handling the hyperheuristic algorithm."""
 import numpy as np
-from Config import Configs
-from Optimizer import Optimizers
-from Optimizer import HyperParameters
+from src.meta_heuristic_algos.Config import Configs
+from src.meta_heuristic_algos.optimizer import Optimizers
+from src.meta_heuristic_algos.optimizer import HyperParameters as HyperParameterClass
 
 Color = Configs.Color # Color -> class
 DataSet = Configs.DataSet # DataSet -> class
-HyperHeuristic = HyperParameters.heuristic  # Hyperheuristic optimizer -> class
+HyperHeuristic = HyperParameterClass.heuristic  # Hyperheuristic optimizer -> class
 
 optimizers = Optimizers.metaheuristic_list # Metaheuristic optimizers -> dict
-HyperParameters = HyperParameters.Parameters # Hyperheuristic parameters -> dict
+HyperParameters = HyperParameterClass.Parameters # Hyperheuristic parameters -> dict
 
 
 class HyperHeuristicTemplate(HyperHeuristic): # inherit from a meta heuristic algorithm
     """ This calss is the ain script of handling the hyperheuristic algorithm"""
-    def __init__(self, obj_function):
+    def __init__(self, obj_function,hyper_iteration):
         self.hyper_func = HyperEvaluationFunction(obj_function)
         self.obj_func = obj_function
-        super().__init__(HyperParameters["max_iter"],
+        super().__init__(hyper_iteration,
                          HyperParameters["num_individual"], self.hyper_func)
 
 class HyperEvaluationFunction:
@@ -40,11 +40,12 @@ class HyperEvaluationFunction:
                                                HyperParameters["num_param_each"]))
         return self.evaluate(param_list,idx)
 
-    def evaluate(self,param_list,idx, tid = [0]):
-        tid[0] += 1
+    def evaluate(self,param_list,idx):
         """ implement the multiprocess for works"""
+
         optimizer_list = np.array(list(optimizers.values()),dtype=object)
         keep_filter = param_list[:,1] > 0
+
         if np.any(keep_filter):
             param_list = param_list[keep_filter]
             if len(param_list.shape) == 1:
@@ -57,7 +58,7 @@ class HyperEvaluationFunction:
         else:
             return np.inf
 
-        total_split = np.sum(param_list[:, 1])
+        total_split = np.int8(np.sum(param_list[:, 1]))
         if total_split == 0:
             return np.inf
 
@@ -75,5 +76,5 @@ class HyperEvaluationFunction:
                 HyperParameters["num_individual"],self.obj_func).start(population_storage)
             curve = np.concatenate((curve, tmpcurve))
 
-        #print(Color.YELLOW + "id: " + str(tid[0]) + "total:" +str(total_split) + "iter" + str(iteration) + Color.RESET)
+        print(f'id: {idx} | total: {total_split} | iter: {iteration}')
         return curve[-1]

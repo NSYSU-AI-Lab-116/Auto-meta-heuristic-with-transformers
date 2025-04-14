@@ -1,5 +1,6 @@
+""" GWO (Grey Wolf Optimization) algorithm implementation """
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """ the entry point of the program"""
 from matplotlib import pyplot as plt
-from Config import Configs
-from Optimizer import HyperParameters
-from hyperheuristic import HyperHeuristicTemplate
+from src.meta_heuristic_algos.Config import Configs
+from src.meta_heuristic_algos.optimizer import HyperParameters
+from src.meta_heuristic_algos.hyperheuristic import HyperHeuristicTemplate
 
 Color = Configs.Color
 DataSet = Configs.DataSet
@@ -76,26 +76,22 @@ class MAINCONTROL:
 
     def create_hyperheuristic_instance(self):
         """ create the hyper heuristic"""
-        #try:
-        HyperParameters.Parameters["max_iter"] = self.iter
         HyperParameters.Parameters["epoch"] = self.epochs
         HyperParameters.Parameters["num_individual"] = 30
         obj_func = DataSet.get_function(self.f_type, self.year, self.name, int(self.dim))
         curves = []
         for epoch in range(self.epochs):
-            population, curve = HyperHeuristicTemplate(obj_function=obj_func).start()
+            population, curve = HyperHeuristicTemplate(obj_function=obj_func,
+                                                       hyper_iteration = self.iter).start()
             print(f"{Color.YELLOW}Best solution: {population}{Color.RESET}")
             curves.append(curve)
-        
+
         for curve in curves:
             plt.plot(curve)
         plt.title(f"Best solution: {population}")
         plt.xlabel("Iterations")
         plt.ylabel("Fitness")
         plt.show()
-
-        #except Exception as e:
-        #   print(f"{Color.RED}Error: {e}{Color.RESET}")
 
 
 
