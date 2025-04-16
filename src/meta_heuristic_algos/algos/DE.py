@@ -33,40 +33,49 @@ class DE:
         self.gbest = None
         self.gbest_score = np.inf
 
-    def optimize(self):
-        """ Perform the optimization process. """
+    def optimize_sequential(self):
         convergence_curve = []
 
-        # initializationn
-        if self.f_type == "hyperheuristic":
-            with ProcessPoolExecutor() as executor:
-                futures = [executor.submit(self.obj_function, self.population[i], i) for i in range(self.num_par)]
-                for i, future in enumerate(futures):
-                    self.fitness[i] = future.result()
-                    if self.fitness[i] < self.gbest_score:
-                        self.gbest_score = self.fitness[i]
-                        self.gbest = self.population[i].copy()
-        else:
+        for i in range(self.num_par):
+            self.fitness[i] = self.obj_function(self.population[i], i)
+            if self.fitness[i] < self.gbest_score:
+                self.gbest_score = self.fitness[i]
+                self.gbest = self.population[i].copy()
+
+        for current_iter in range(self.max_iter):
             for i in range(self.num_par):
-                self.fitness[i] = self.obj_function(self.population[i],i)
+                self.core_logic(i)
+            convergence_curve.append(self.gbest_score)
+        return self.gbest, self.gbest_score, convergence_curve, self.population
+
+    def optimize_parallel(self):
+        convergence_curve = []
+
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(self.obj_function, self.population[i], i)
+                       for i in range(self.num_par)]
+            for i, future in enumerate(futures):
+                self.fitness[i] = future.result()
                 if self.fitness[i] < self.gbest_score:
                     self.gbest_score = self.fitness[i]
                     self.gbest = self.population[i].copy()
 
-        # iteration
         for current_iter in range(self.max_iter):
-            if self.f_type == "hyperheuristic":
-                print(f"{Configs.Color.RED}Hyperheuristic iter:{current_iter}{Configs.Color.RESET}")
-                with ProcessPoolExecutor() as executor:
-                    futures = [executor.submit(self.core_logic,i) for i in range(self.num_par)]
-                    for future in futures:
-                        future.result()
-            else:
-                for i in range(self.num_par):
-                    self.core_logic(i)
-
+            print(f"{Configs.Color.RED}Hyperheuristic iter:{current_iter}{Configs.Color.RESET}")
+            with ProcessPoolExecutor() as executor:
+                futures = [executor.submit(self.core_logic, i)
+                           for i in range(self.num_par)]
+                for future in futures:
+                    future.result()
             convergence_curve.append(self.gbest_score)
-        return self.gbest, self.gbest_score, convergence_curve, self.population   
+        return self.gbest, self.gbest_score, convergence_curve, self.population
+
+    def optimize(self):
+        """ Perform the optimization process. """
+        if __name__ == '__main__':
+            return self.optimize_parallel()
+        else:
+            return self.optimize_sequential()  
 
     def core_logic(self,i):
         # randomly select
