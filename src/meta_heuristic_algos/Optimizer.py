@@ -18,27 +18,27 @@ from src.meta_heuristic_algos.algos.TABU import TSCONTROL
 class Optimizers:
     """ This class stores all the metaheuristic algorithms"""
     metaheuristic_list = {
-        #"EDGWO": EDGWOCONTROL,
+        "EDGWO": EDGWOCONTROL,
         "GWO": GWOCONTROL,
-        #"CHGWOSCA": CHGWOSCACONTROL,
-        #"REEGWO": REEGWOCONTROL,
-        #"MSGWO": MSGWOCONTROL,
-        #"BES": BESCONTROL,
-        #"ChOA": ChOACONTROL,
-        #"PSO" :PSOCONTROL,
-        #"HHO" :HHOCONTROL,
-        #"SCSO":SCSOCONTROL,
-        #"REINEDGWO": REINEDGWOCONTROL,
+        "CHGWOSCA": CHGWOSCACONTROL,
+        "REEGWO": REEGWOCONTROL,
+        "MSGWO": MSGWOCONTROL,
+        "BES": BESCONTROL,
+        #"ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
+        "PSO" :PSOCONTROL,
+        "HHO" :HHOCONTROL,
+        "SCSO":SCSOCONTROL,
+        "REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,
-        #"GA": GACONTROL,
-        #"SA": SACONTROL,
-        #"TABU": TSCONTROL
+        "GA": GACONTROL,
+        #"SA": SACONTROL, # issue: type nd.numpyfloat64 has no attribute 'len()'
+        #"TABU": TSCONTROL # issue: type nd.numpyfloat64 has no attribute 'len()'
     }
 
 class HyperParameters :
     """ This stores the configs for the heuristic algorithm"""
     heuristic = DECONTROL  #Hyperheuristic algorithm
-    
+
     # heurictic and hyperheuristic parameters
     Parameters = {
         "max_iter": 500,
@@ -46,6 +46,6 @@ class HyperParameters :
         "dim": None,
         "num_individual": 30,
         "num_param_each": 2,
-        "ub": [10,10]*2,
-        "lb": [0,0]*2,
+        "ub": [10,10]*12,
+        "lb": [0,0]*12,
     }

@@ -5,12 +5,12 @@ from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 
 class REIN_EDGWO:
-    def __init__(self, obj_function, dim, lb, ub, num_wolves, MAX_ITER, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_pop, MAX_ITER, f_type, init_population=None):
         self.obj_function = obj_function  # 目標函數
         self.dim = dim                    # 變數維度
         self.lb = np.array(lb)            # 下界
         self.ub = np.array(ub)            # 上界
-        self.num_wolves = num_wolves      # 狼群數量
+        self.num_pop = num_pop      # 狼群數量
         self.MAX_ITER = MAX_ITER          # 最大迭代次數
         self.f_type = f_type
 
@@ -20,7 +20,11 @@ class REIN_EDGWO:
             self.dim+=1
 
         # 初始化狼群位置
-        self.wolves = np.random.uniform(self.lb, self.ub, (self.num_wolves, self.dim))
+        
+        if init_population is None:
+            self.wolves = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
+        else:
+            self.wolves = init_population
         self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
 
@@ -45,7 +49,7 @@ class REIN_EDGWO:
         for t in range(self.MAX_ITER):
             mean_pos = np.mean(self.wolves, axis=0)
 
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 fitness = self.obj_function(self.wolves[i])
                 if fitness < self.alpha_score:
                     self.delta_score, self.delta = self.beta_score, self.beta.copy()
@@ -58,7 +62,7 @@ class REIN_EDGWO:
                     self.delta_score, self.delta = fitness, self.wolves[i].copy()
 
             a = 2 * np.exp(-t / self.MAX_ITER) # 改用指數衰減
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 X1 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.alpha)
                 X2 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.beta)
                 X3 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.delta)
@@ -83,7 +87,7 @@ class REIN_EDGWO:
             if (self.PreAlpha_score - self.alpha_score) < eps:
                 # 擾動(隨時間遞減)
                 strength = (self.ub - self.lb) * 0.05 * (1 - t / self.MAX_ITER)
-                for i in range(self.num_wolves):
+                for i in range(self.num_pop):
                     if np.random.rand() < 0.1:  # 10% 對個體進行突變
                         mutation = np.random.uniform(-1, 1, self.dim) * strength
                         self.wolves[i] = np.clip(self.wolves[i] + mutation, self.lb, self.ub)
@@ -92,8 +96,8 @@ class REIN_EDGWO:
             # 多樣性過低 -> reset部分個體
             diversity = np.mean(np.std(self.wolves, axis=0))
             if diversity < 0.01 * np.mean(self.ub - self.lb):
-                Reset_num = max(1, int(0.2 * self.num_wolves)) # 隨機選擇20%
-                indices = np.random.choice(range(self.num_wolves), size=Reset_num, replace=False)
+                Reset_num = max(1, int(0.2 * self.num_pop)) # 隨機選擇20%
+                indices = np.random.choice(range(self.num_pop), size=Reset_num, replace=False)
                 for idx in indices:
                     self.wolves[idx] = np.random.uniform(self.lb, self.ub, self.dim)
 
@@ -114,9 +118,9 @@ class REINEDGWOCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         gwo = REIN_EDGWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_wolves=self.NUM_WOLVES, MAX_ITER=self.MAX_ITER, f_type=self.f_type)
+                    num_pop=self.NUM_WOLVES, MAX_ITER=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, wolves = gwo.optimize()
         
         """ print("Best solution found:", best_position)
@@ -147,7 +151,7 @@ if __name__ == '__main__':
             # 設定參數
             
             # 執行 GWO
-            gwo = REIN_EDGWO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_wolves=NUM_WOLVES, max_iter=MAX_ITER)
+            gwo = REIN_EDGWO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_WOLVES, max_iter=MAX_ITER)
             best_position, best_value, curve, _ = gwo.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)

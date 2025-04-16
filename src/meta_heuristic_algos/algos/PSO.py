@@ -79,7 +79,7 @@ class PSOCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self, init_population=None):
+    def start(self, init_population=None):
         pso = PSO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                   num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type,
                   init_population=init_population)

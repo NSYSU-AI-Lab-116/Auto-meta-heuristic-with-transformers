@@ -10,12 +10,12 @@ def logistics_chaotic_map(dim, iteration=10, value=1):
     return x0
 # 定義 Chimp Optimization Algorithm (ChOA)
 class ChOA:
-    def __init__(self, obj_function, dim, lb, ub, num_chimps, max_iter,f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
         self.ub = np.array(ub)
-        self.num_chimps = num_chimps
+        self.num_pop = num_pop
         self.max_iter = max_iter
         self.f_type = f_type
 
@@ -24,14 +24,18 @@ class ChOA:
             self.lb = np.append(self.lb[:], 1)
             self.dim+=1
         # 初始化黑猩猩群體
-        self.chimps = np.random.uniform(self.lb, self.ub, (self.num_chimps, self.dim))
+        if init_population is None:
+            self.chimps = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
+        else:
+            self.chimps = init_population
+
         self.attacker = self.chimps[0].copy()
         self.chaser = self.chimps[1].copy()
         self.barrier = self.chimps[2].copy()
         self.driven = self.chimps[3].copy()
 
         # 初始化適應度
-        self.scores = np.full(self.num_chimps, np.inf)
+        self.scores = np.full(self.num_pop, np.inf)
 
     def logistics_chaotic_map(self, dim, iteration=10, value=1):
         x0 = np.zeros(dim) + 0.7
@@ -45,7 +49,7 @@ class ChOA:
             f = 2.5 - (t * (2.5 / self.max_iter))  # 動態調整因子 f
 
             # 計算所有黑猩猩的適應度
-            for i in range(self.num_chimps):
+            for i in range(self.num_pop):
                 self.scores[i] = self.obj_function(self.chimps[i])
 
             # 排序黑猩猩，選出最好的四隻 (攻擊者、追逐者、障礙者、驅動者)
@@ -57,7 +61,7 @@ class ChOA:
             
             # 未考慮 social incentive
             # 位置更新
-            for i in range(self.num_chimps):
+            for i in range(self.num_pop):
                 m = self.logistics_chaotic_map(1)
 
                 r1, r2 = np.random.rand(), np.random.rand()
@@ -110,9 +114,9 @@ class ChOACONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         choa = ChOA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_chimps=self.NUM_CHIMPS, max_iter=self.MAX_ITER, f_type=self.f_type)
+                    num_pop=self.NUM_CHIMPS, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, chimps = choa.optimize()
 
         if(self.f_type == "d"):
@@ -135,7 +139,7 @@ if __name__ == '__main__':
             dim = function.dim
             f = function.func
 
-            choa = ChOA(obj_function=f, dim=DIM, lb=LB, ub=UB, num_chimps=NUM_CHIMPS, max_iter=MAX_ITER)
+            choa = ChOA(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_CHIMPS, max_iter=MAX_ITER)
             best_position, best_value, curve = choa.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)

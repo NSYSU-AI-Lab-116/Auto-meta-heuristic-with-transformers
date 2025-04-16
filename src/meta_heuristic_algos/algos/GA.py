@@ -97,7 +97,7 @@ class GACONTROL:
         self.f_type = FUNCTION.f_type
         self.mutation_rate = mutation_rate
     
-    def Start(self, init_population=None):
+    def start(self, init_population=None):
         ga = GA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                 pop_size=self.POP_SIZE, max_iter=self.MAX_ITER, f_type=self.f_type,
                 mutation_rate=self.mutation_rate, init_population=init_population)

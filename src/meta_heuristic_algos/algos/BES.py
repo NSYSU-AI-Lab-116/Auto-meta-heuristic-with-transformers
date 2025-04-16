@@ -4,7 +4,7 @@ from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 
 class BES:
-    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, w=0.7, c1=1.5, c2=1.5):
+    def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, w=0.7, c1=1.5, c2=1.5, init_population=None):
         self.obj_function = obj_function
         self.dim = dim
         self.lb = np.array(lb)
@@ -22,12 +22,15 @@ class BES:
             self.dim+=1
 
         # 初始化
-        self.particles = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
+        if init_population is None:
+            self.particles = np.random.uniform(self.lb, self.ub, (self.num_par, self.dim))
+        else:
+            self.particles = init_population
         self.best_position = np.zeros((self.num_par, self.dim))  # 最佳位置
 
         self.energy = np.ones(self.num_par)  # 初始設定為1
         self.best_energy = np.full(self.num_par, np.inf)  # 最佳能量
-        
+
         self.gbest_position = np.random.uniform(self.lb, self.ub, self.dim) # 最佳解(全局)
         self.gbest_energy = np.inf
 
@@ -87,9 +90,9 @@ class BESCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         bes = BES(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type)
+                    num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, particles = bes.optimize()
         
         """ print("Best solution found:", best_position)

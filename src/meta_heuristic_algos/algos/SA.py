@@ -91,7 +91,7 @@ class SACONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self, init_population=None):
+    def start(self, init_population=None):
         sa = SA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB,
                 max_iter=self.MAX_ITER, init_temp=self.INIT_TEMP, cooling_rate=self.COOLING_RATE,
                 f_type=self.f_type, init_population=init_population)

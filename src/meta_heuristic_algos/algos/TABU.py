@@ -117,7 +117,7 @@ class TSCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self, init_population=None):
+    def start(self, init_population=None):
         ts = TS(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB,
                 max_iter=self.MAX_ITER, f_type=self.f_type,
                 tabu_list_size=self.TABU_SIZE, num_neighbors=self.NUM_NEIGHBORS, tolerance=self.TOLERANCE, init_population=init_population)

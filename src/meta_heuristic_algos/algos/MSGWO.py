@@ -5,32 +5,36 @@ from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 
 class MSGWO:
-    def __init__(self, obj_function, dim, lb, ub, num_wolves, max_iter, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
         self.obj_function = obj_function  # 目標函數
         self.dim = dim                    # 變數維度
         self.lb = np.array(lb)            # 下界
         self.ub = np.array(ub)            # 上界
-        self.num_wolves = num_wolves      # 狼群數量
+        self.num_pop = num_pop      # 狼群數量
         self.max_iter = max_iter          # 最大迭代次數
         self.f_type = f_type              # 連續/離散問題
-
-        # 初始化狼群位置
 
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
             self.dim+=1
-        self.wolves = np.random.uniform(self.lb, self.ub, (self.num_wolves, self.dim))
+            
+        # 初始化狼群位置
+        if init_population is None:
+            self.wolves = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
+        else:
+            self.wolves = init_population
+
         self.alpha = np.random.uniform(self.lb, self.ub, self.dim)
         self.beta  = np.random.uniform(self.lb, self.ub, self.dim)
         self.delta = np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
-    
+
     def optimize(self):
         convergence_curve = []
         for t in range(self.max_iter):
             # 更新 Alpha Beta Delta(同上)
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 fitness = self.obj_function(self.wolves[i])
                 if fitness < self.alpha_score:
                     self.delta_score, self.delta = self.beta_score, self.beta.copy()
@@ -45,7 +49,7 @@ class MSGWO:
             # 利用tangent衰減            
             a = 2 - 2 * np.tan((np.pi/4) * (t / self.max_iter))
 
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 # X1 
                 r1, r2 = np.random.rand(), np.random.rand()
                 A1, C1 = 2 * a * r1 - a, 2 * r2
@@ -97,9 +101,9 @@ class MSGWOCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         gwo = MSGWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type)
+                    num_pop=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, wolves = gwo.optimize()
         
         """ print("Best solution found:", best_position)
@@ -133,7 +137,7 @@ if __name__ == '__main__':
 
     
             # 執行 GWO
-            gwo = MSGWO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_wolves=NUM_WOLVES, max_iter=MAX_ITER)
+            gwo = MSGWO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_WOLVES, max_iter=MAX_ITER)
             best_position, best_value, curve = gwo.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)

@@ -5,12 +5,12 @@ DataSet = Configs.DataSet
 
 # 定義 Sand Cat Swarm Optimization (SCSO)
 class SCSO:
-    def __init__(self, obj_function, dim, lb, ub, num_cats, max_iter, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
         self.obj_function = obj_function  # 目標函數
         self.dim = dim                    # 變數維度
         self.lb = np.array(lb)            # 下界
         self.ub = np.array(ub)            # 上界
-        self.num_cats = num_cats          # 沙貓數量
+        self.num_pop = num_pop          # 沙貓數量
         self.max_iter = max_iter          # 最大迭代次數
         self.f_type = f_type              # 連續/離散問題
         
@@ -20,7 +20,11 @@ class SCSO:
             self.dim += 1
 
         # 初始化沙貓位置
-        self.cats = np.random.uniform(self.lb, self.ub, (self.num_cats, self.dim))
+        if init_population is None:
+            self.cats = np.random.uniform(self.lb, self.ub,(self.num_pop, self.dim))
+        else:
+            self.cats = init_population
+
         self.best_cat = np.random.uniform(self.lb, self.ub, self.dim)
         self.best_score = np.inf
 
@@ -29,7 +33,7 @@ class SCSO:
         
         for t in range(self.max_iter):
             # 計算適應度並更新最佳沙貓
-            for i in range(self.num_cats):
+            for i in range(self.num_pop):
                 fitness = self.obj_function(self.cats[i])
                 if fitness < self.best_score:
                     self.best_score = fitness
@@ -40,7 +44,7 @@ class SCSO:
             R = 2 * rG * np.random.rand() - rG
             
             # 更新位置
-            for i in range(self.num_cats):
+            for i in range(self.num_pop):
                 r = rG * np.random.rand()
                 theta = np.random.uniform(-np.pi, np.pi)  # 隨機角度
                 if abs(R) <= 1:
@@ -74,9 +78,9 @@ class SCSOCONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         scso = SCSO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_cats=self.NUM_CATS, max_iter=self.MAX_ITER, f_type=self.f_type)
+                    num_pop=self.NUM_CATS, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, cats = scso.optimize()
         
         if self.f_type == "d":
@@ -102,7 +106,7 @@ if __name__ == '__main__':
             dim = function.dim
             f = function.func
 
-            scso = SCSO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_cats=NUM_CATS, max_iter=MAX_ITER)
+            scso = SCSO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_CATS, max_iter=MAX_ITER)
             best_position, best_value, curve = scso.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)

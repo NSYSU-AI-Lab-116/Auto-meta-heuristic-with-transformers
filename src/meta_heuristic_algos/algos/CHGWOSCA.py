@@ -1,15 +1,14 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 
 class CHGWOSCA:
-    def __init__(self, obj_function, dim, lb, ub, num_wolves, max_iter, f_type):
+    def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
         self.obj_function = obj_function  
         self.dim = dim
         self.lb = np.array(lb)
         self.ub = np.array(ub)
-        self.num_wolves = num_wolves
+        self.num_pop = num_pop
         self.max_iter = max_iter
         self.f_type = f_type
 
@@ -18,15 +17,21 @@ class CHGWOSCA:
             self.lb = np.append(self.lb[:], 1)
             self.dim+=1
 
-        self.wolves = np.random.uniform(self.lb, self.ub, (self.num_wolves, self.dim))
-        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim),np.random.uniform(self.lb, self.ub, self.dim)
+        if init_population is None:
+            self.wolves = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
+        else:
+            self.wolves = init_population
+
+        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim),\
+                                            np.random.uniform(self.lb, self.ub, self.dim),\
+                                            np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
 
     def optimize(self):
         convergence_curve = []
         for t in range(self.max_iter):
             # 更新 Alpha Beta Delta
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 fitness = self.obj_function(self.wolves[i])
                 if fitness < self.alpha_score:
                     self.delta_score, self.delta = self.beta_score, self.beta.copy()
@@ -42,7 +47,7 @@ class CHGWOSCA:
             w = t / self.max_iter # dynamic adjustment
 
             # 更新所有狼的位置
-            for i in range(self.num_wolves):
+            for i in range(self.num_pop):
                 # --- GWO 更新公式 ---
                 r1, r2 = np.random.rand(), np.random.rand() 
                 A1, C1 = 2 * a * r1 - a, 2 * r2
@@ -96,9 +101,9 @@ class CHGWOSCACONTROL:
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
-    def Start(self):
+    def start(self, init_population=None):
         gwo = CHGWOSCA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
-                    num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type)
+                    num_pop=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, wolves = gwo.optimize()
         
         """ print("Best solution found:", best_position)
@@ -132,7 +137,7 @@ if __name__ == '__main__':
 
     
             # 執行 GWO
-            gwo = CHGWOSCA(obj_function=f, dim=DIM, lb=LB, ub=UB, num_wolves=NUM_WOLVES, max_iter=MAX_ITER)
+            gwo = CHGWOSCA(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_WOLVES, max_iter=MAX_ITER)
             best_position, best_value, curve = gwo.optimize()
 
             print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
