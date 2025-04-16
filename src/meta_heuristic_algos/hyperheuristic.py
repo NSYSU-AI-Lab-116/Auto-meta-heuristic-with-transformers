@@ -1,8 +1,8 @@
 """This script is the main script of handling the hyperheuristic algorithm."""
 import numpy as np
 from src.meta_heuristic_algos.Config import Configs
-from src.meta_heuristic_algos.optimizer import Optimizers
-from src.meta_heuristic_algos.optimizer import HyperParameters as HyperParameterClass
+from src.meta_heuristic_algos.Optimizer import Optimizers
+from src.meta_heuristic_algos.Optimizer import HyperParameters as HyperParameterClass
 
 Color = Configs.Color # Color -> class
 DataSet = Configs.DataSet # DataSet -> class
@@ -64,16 +64,21 @@ class HyperEvaluationFunction:
 
         population_storage = None
         curve = np.array([])
-        iteration = int(HyperParameters["max_iter"] * param_list[0,1] / total_split )
-        population_storage, tmpcurve = optimizer_list[0](iteration,\
-            HyperParameters["num_individual"], self.obj_func).start()
 
+        # first algo
+        iteration = max(1, int(HyperParameters["max_iter"] * param_list[0, 1] / total_split))
+        population_storage, tmpcurve = optimizer_list[0](
+        iteration, 
+        HyperParameters["num_individual"], 
+        self.obj_func).start()
         curve = np.concatenate((curve, tmpcurve))
 
         for i in range(1,len(param_list)):
-            iteration = int(HyperParameters["max_iter"] * param_list[i,1] / total_split)
-            population_storage, tmpcurve = optimizer_list[i](iteration,\
-                HyperParameters["num_individual"],self.obj_func).start(population_storage)
+            iteration = max(1, int(HyperParameters["max_iter"] * param_list[i, 1] / total_split))
+            population_storage, tmpcurve = optimizer_list[i](
+            iteration, 
+            HyperParameters["num_individual"], 
+            self.obj_func).start(population_storage)
             curve = np.concatenate((curve, tmpcurve))
 
         print(f'id: {idx} | total: {total_split} | iter: {iteration}')
