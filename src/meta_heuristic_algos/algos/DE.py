@@ -14,12 +14,11 @@ def safe_eval(fn, ind, idx):
 
 
 def parallel_eval(fn, pop):
-    return np.array(
-        Parallel(n_jobs=JOBS_INNER, backend="loky", verbose=0)(
-            delayed(safe_eval)(fn, ind, i) for i, ind in enumerate(pop)
+    with Parallel(n_jobs=JOBS_INNER, backend="loky", verbose=0) as parallel:
+        return np.array(
+            parallel(delayed(safe_eval)(fn, ind, i)
+                     for i, ind in enumerate(pop))
         )
-    )
-
 
 class DE:
     """Differential Evolution algorithm for optimization (with joblib inner‑population parallel)."""
