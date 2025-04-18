@@ -1,7 +1,6 @@
 """Model for Differential Evolution (DE) algorithm."""
 import numpy as np
 from src.meta_heuristic_algos.Config import Configs
-from concurrent.futures import ProcessPoolExecutor
 DataSet = Configs.DataSet
 
 class DE:
@@ -33,49 +32,25 @@ class DE:
         self.gbest = None
         self.gbest_score = np.inf
 
-    def optimize_sequential(self):
-        convergence_curve = []
 
+    def optimize(self):
+        """ Perform the optimization process. """
+        curve = []
+        # Evaluate initial fitness
         for i in range(self.num_par):
             self.fitness[i] = self.obj_function(self.population[i], i)
             if self.fitness[i] < self.gbest_score:
                 self.gbest_score = self.fitness[i]
                 self.gbest = self.population[i].copy()
 
-        for current_iter in range(self.max_iter):
+        # Main iterations
+        for _ in range(self.max_iter):
             for i in range(self.num_par):
                 self.core_logic(i)
-            convergence_curve.append(self.gbest_score)
-        return self.gbest, self.gbest_score, convergence_curve, self.population
+            curve.append(self.gbest_score)
 
-    def optimize_parallel(self):
-        convergence_curve = []
+        return self.gbest, self.gbest_score, curve, self.population
 
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(self.obj_function, self.population[i], i)
-                       for i in range(self.num_par)]
-            for i, future in enumerate(futures):
-                self.fitness[i] = future.result()
-                if self.fitness[i] < self.gbest_score:
-                    self.gbest_score = self.fitness[i]
-                    self.gbest = self.population[i].copy()
-
-        for current_iter in range(self.max_iter):
-            print(f"{Configs.Color.RED}Hyperheuristic iter:{current_iter}{Configs.Color.RESET}")
-            with ProcessPoolExecutor() as executor:
-                futures = [executor.submit(self.core_logic, i)
-                           for i in range(self.num_par)]
-                for future in futures:
-                    future.result()
-            convergence_curve.append(self.gbest_score)
-        return self.gbest, self.gbest_score, convergence_curve, self.population
-
-    def optimize(self):
-        """ Perform the optimization process. """
-        if __name__ == '__main__':
-            return self.optimize_parallel()
-        else:
-            return self.optimize_sequential()  
 
     def core_logic(self,i):
         # randomly select
