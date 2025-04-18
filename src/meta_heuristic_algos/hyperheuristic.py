@@ -30,7 +30,7 @@ class HyperEvaluationFunction:
         self.func = self.call
         self.f_type = "hyperheuristic"
 
-    def call(self, individual: list, idx: int) -> float:
+    def call(self, individual: list, idx=None) -> float:
         """ This function is called when this class instance is called
         :param individual: list of parameters
         :param idx: index of the individual
