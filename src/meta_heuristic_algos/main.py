@@ -2,11 +2,29 @@
 """ the entry point of the program"""
 from matplotlib import pyplot as plt
 from src.meta_heuristic_algos.Config import Configs
-from src.meta_heuristic_algos.optimizer import HyperParameters
+from src.meta_heuristic_algos.Optimizer import HyperParameters
 from src.meta_heuristic_algos.hyperheuristic import HyperHeuristicTemplate
+
+import os
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import numpy as np
 
 Color = Configs.Color
 DataSet = Configs.DataSet
+
+def _run_epoch(args):
+    epoch_idx, f_type, year, name, dim, iterations = args
+
+    np.random.seed(os.getpid())
+
+    obj_func = DataSet.get_function(f_type, year, name, int(dim))
+    population, curve = HyperHeuristicTemplate(
+        obj_function=obj_func,
+        hyper_iteration=iterations,
+    ).start()
+
+    return epoch_idx, population, curve
 
 class MAINCONTROL:
     """ This class is the main control of the program"""
@@ -78,17 +96,28 @@ class MAINCONTROL:
         """ create the hyper heuristic"""
         HyperParameters.Parameters["epoch"] = self.epochs
         HyperParameters.Parameters["num_individual"] = 30
-        obj_func = DataSet.get_function(self.f_type, self.year, self.name, int(self.dim))
-        curves = []
-        for epoch in range(self.epochs):
-            population, curve = HyperHeuristicTemplate(obj_function=obj_func,
-                                                       hyper_iteration = self.iter).start()
-            print(f"{Color.YELLOW}Best solution: {population}{Color.RESET}")
-            curves.append(curve)
+
+        # tasks for parallel processing
+        tasks = [
+            (e, self.f_type, self.year, self.name, self.dim, self.iter)
+            for e in range(self.epochs)]
+
+        curves = [None] * self.epochs
+        best_pop, best_fit = None, np.inf
+
+        with ProcessPoolExecutor(max_workers=Configs.executer_num) as pool:
+            for future in as_completed(pool.submit(_run_epoch, t) for t in tasks):
+                epoch_idx, pop, curve = future.result()
+                curves[epoch_idx] = curve
+                if curve[-1] < best_fit:
+                    best_fit, best_pop = curve[-1], pop
+                print(f"{Color.CYAN}[Epoch {epoch_idx}] fitness={curve[-1]}{Color.RESET}")
+        
+        print(f"{Color.YELLOW}Global best fitness: {best_fit}{Color.RESET}")
 
         for curve in curves:
             plt.plot(curve)
-        plt.title(f"Best solution: {population}")
+        plt.title(f"Best solution: {best_pop}")
         plt.xlabel("Iterations")
         plt.ylabel("Fitness")
         plt.show()
@@ -96,6 +125,6 @@ class MAINCONTROL:
 
 
 if __name__ == '__main__':
+    mp.set_start_method("spawn", force=True) # prevent from error between running on Linux/Windows
     MAINCONTROL()
-
     print(f"{Color.RED}Quitting...{Color.RESET}")
