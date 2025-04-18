@@ -45,6 +45,7 @@ class DE:
         self.f_type = f_type
         self.factor = factor  # scaling factor
         self.cross_rate = cross_rate  # cross rate
+        self.parallel = Parallel(n_jobs=jobs_inner, backend="loky", verbose=0)
 
         if self.f_type == "d":
             self.ub = np.append(self.ub, DataSet.NN_K)
@@ -73,7 +74,8 @@ class DE:
                 trial_pop[i] = self.core_logic(i, rng)
 
             # evaluate(parallel)
-            trial_fitness = parallel_eval(self.obj_function, trial_pop)
+            trial_fitness = np.array(
+            self.parallel(delayed(safe_eval)(self.obj_function, ind, i)for i, ind in enumerate(trial_pop)))
 
             replace = trial_fitness < self.fitness
             self.population[replace] = trial_pop[replace]
