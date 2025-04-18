@@ -1,4 +1,3 @@
-import opfunu as of
 import scipy.io as sio
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier as KNN

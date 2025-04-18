@@ -12,9 +12,9 @@ class TS:
         self.ub = np.array(ub)
         self.max_iter = max_iter
         self.f_type = f_type
-        self.tabu_list_size = tabu_list_size   
-        self.num_neighbors = num_neighbors     
-        self.tolerance = tolerance             
+        self.tabu_list_size = tabu_list_size
+        self.num_neighbors = num_neighbors   
+        self.tolerance = tolerance     
 
         if self.f_type == "d":
             self.ub = np.append(self.ub, DataSet.NN_K)

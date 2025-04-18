@@ -18,15 +18,15 @@ from src.meta_heuristic_algos.algos.TABU import TSCONTROL
 class Optimizers:
     """ This class stores all the metaheuristic algorithms"""
     metaheuristic_list = {
-        "EDGWO": EDGWOCONTROL,
+        #"EDGWO": EDGWOCONTROL,
         "GWO": GWOCONTROL,
         "CHGWOSCA": CHGWOSCACONTROL,
-        "REEGWO": REEGWOCONTROL,
+        #"REEGWO": REEGWOCONTROL,
         "MSGWO": MSGWOCONTROL,
         "BES": BESCONTROL,
         #"ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
         "PSO" :PSOCONTROL,
-        "HHO" :HHOCONTROL,
+        #"HHO" :HHOCONTROL,
         "SCSO":SCSOCONTROL,
         "REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,
@@ -41,11 +41,13 @@ class HyperParameters :
 
     # heurictic and hyperheuristic parameters
     Parameters = {
-        "max_iter": 500,
+        "meta_iter": 500,
+        "hyper_iter": 300,
         "epoch": 10,
-        "dim": None,
-        "num_individual": 30,
+        "f_type": "continue",
+        "num_metaheuristic": len(Optimizers.metaheuristic_list),
+        "num_individual": 10,
         "num_param_each": 2,
-        "ub": [10,10]*12,
-        "lb": [0,0]*12,
+        "ub": [10,10]*len(Optimizers.metaheuristic_list),
+        "lb": [0,0]*len(Optimizers.metaheuristic_list),
     }
