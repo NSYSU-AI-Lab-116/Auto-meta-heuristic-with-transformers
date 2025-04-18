@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 from src.meta_heuristic_algos.Config import Configs
 
 DataSet = Configs.DataSet
-JOBS_INNER = max(1, Configs.executer_num)  # 依外層 CPU 使用量手動調整
+jobs_inner = max(1, Configs.executer_num)  # CPU configuration
 
 
 def safe_eval(fn, ind, idx):
@@ -14,7 +14,7 @@ def safe_eval(fn, ind, idx):
 
 
 def parallel_eval(fn, pop):
-    with Parallel(n_jobs=JOBS_INNER, backend="loky", verbose=0) as parallel:
+    with Parallel(n_jobs=jobs_inner, backend="loky", verbose=0) as parallel:
         return np.array(
             parallel(delayed(safe_eval)(fn, ind, i)
                      for i, ind in enumerate(pop))
