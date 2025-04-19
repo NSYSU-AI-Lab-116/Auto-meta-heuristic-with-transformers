@@ -1,8 +1,22 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
+import os
+from joblib import Parallel, delayed
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
+
+jobs_inner = max(1, Configs.executer_num)
+
+def safe_eval(fn, ind, idx):
+    # ensure different seed
+    #np.random.seed(os.getpid() & 0xFFFF)
+    return fn(ind, idx)
+
+def parallel_eval(fn, pop):
+    with Parallel(n_jobs=jobs_inner, backend="threading", verbose=0) as parallel:
+        return np.array(
+            parallel(delayed(safe_eval)(fn, ind, i)
+                     for i, ind in enumerate(pop))
+        )
 
 class PSO:
     def __init__(self, obj_function, dim, lb, ub, num_par, max_iter, f_type, init_population=None):
@@ -16,6 +30,7 @@ class PSO:
         self.w = 0.7
         self.c1 = 2
         self.c2 = 2
+        self.parallel = Parallel(n_jobs=jobs_inner, backend="threading", verbose=0)
 
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
@@ -29,44 +44,50 @@ class PSO:
 
         self.velocities = np.random.uniform(-abs(self.ub - self.lb), abs(self.ub - self.lb), (self.num_par, self.dim))
         self.pbest = self.particles.copy()
-        self.pbest_scores = np.array([np.inf] * self.num_par)
-        self.gbest = np.random.uniform(self.lb, self.ub, self.dim)
-        self.gbest_score = np.inf
+        self.pbest_scores = parallel_eval(self.obj_function, self.particles)
+        self.gbest_idx = np.argmin(self.pbest_scores)
+        self.gbest = self.particles[self.gbest_idx].copy()
+        self.gbest_score = self.pbest_scores[self.gbest_idx]
     
     def optimize(self):
         convergence_curve = []
-
         for t in range(self.max_iter):
-            for i in range(self.num_par):
-                fitness = self.obj_function(self.particles[i])
-                
-                if fitness < self.pbest_scores[i]:
-                    self.pbest_scores[i] = fitness
-                    self.pbest[i] = self.particles[i].copy()
-
-                if fitness < self.gbest_score:
-                    self.gbest_score = fitness
-                    self.gbest = self.particles[i].copy()
-        
+            # 生成所有新位置
+            trial_particles = np.zeros_like(self.particles)
             for i in range(self.num_par):
                 r1, r2 = np.random.rand(self.dim), np.random.rand(self.dim)
-                cognitive_component = self.c1 * r1 * (self.pbest[i] - self.particles[i])
-                social_component = self.c2 * r2 * (self.gbest - self.particles[i])
-                self.velocities[i] = self.w * self.velocities[i] + cognitive_component + social_component
+                cognitive = self.c1 * r1 * (self.pbest[i] - self.particles[i])
+                social = self.c2 * r2 * (self.gbest - self.particles[i])
+                self.velocities[i] = self.w * self.velocities[i] + cognitive + social
+                trial_particles[i] = self.particles[i] + self.velocities[i]
 
-                # 更新位置
-                self.particles[i] += self.velocities[i]
-
-                if self.f_type =="d":# 邊界處理
-                    self.particles[i][-1] = np.clip(self.particles[i][-1], 1, DataSet.NN_K)
-                    self.particles[i][:-1] = np.clip(self.particles[i][:-1], DataSet.param_LB, DataSet.param_UB)
+                # 邊界處理
+                if self.f_type =="d":
+                    trial_particles[i][-1] = np.clip(trial_particles[i][-1], 1, DataSet.NN_K)
+                    trial_particles[i][:-1] = np.clip(trial_particles[i][:-1], DataSet.param_LB, DataSet.param_UB)
                 else:
-                    self.particles[i] = np.clip(self.particles[i], self.lb, self.ub)
+                    trial_particles[i] = np.clip(trial_particles[i], self.lb, self.ub)
+
+            # 并行評估所有粒子
+            trial_scores = np.array(
+                self.parallel(delayed(safe_eval)(self.obj_function, ind, i)
+                for i, ind in enumerate(trial_particles)
+            ))
+
+            # 更新粒子狀態
+            improved = trial_scores < self.pbest_scores
+            self.particles[improved] = trial_particles[improved]
+            self.pbest[improved] = trial_particles[improved]
+            self.pbest_scores[improved] = trial_scores[improved]
+
+            current_gbest_idx = np.argmin(self.pbest_scores)
+            if self.pbest_scores[current_gbest_idx] < self.gbest_score:
+                self.gbest_score = self.pbest_scores[current_gbest_idx]
+                self.gbest = self.particles[current_gbest_idx].copy()
 
             convergence_curve.append(self.gbest_score)
     
         return self.gbest, self.gbest_score, convergence_curve, self.particles
-
 
 class PSOCONTROL:
     __name__ = "PSO"
@@ -90,38 +111,5 @@ class PSOCONTROL:
         else:
             return (particles, np.log10(curve))
 
-
-
-
 if __name__ == '__main__':
-    """ funcs_by_year = DataSet.funcs_years
-
-    # 設定參數
-    MAX_ITER = 500
-    NUM_PARTICLES = 30
-    DIM = 10
-
-    # CEC 函式呼叫方法  
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year,func_name,DIM)  # 取得CEC Year年度，維度為 DIM 之 F1 函式的資訊
-            UB = function.ub
-            LB = function.lb
-            f = function.func # 取得函式
-            # 計算函式值 f([多個維度組成的陣列])   -> 例如 f([x,y])
-
-    
-            # 執行 PSO
-            pso = PSO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_par=NUM_PARTICLES, max_iter=MAX_ITER)
-            best_position, best_value, curve = pso.optimize()
-
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-
-            # 繪製收斂曲線
-            plt.plot(np.log10(curve))
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"PSO Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
- """
+    pass

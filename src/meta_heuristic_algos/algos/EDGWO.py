@@ -1,39 +1,52 @@
+import os
 import numpy as np
-
+from joblib import Parallel, delayed
 from src.meta_heuristic_algos.Config import Configs
+
 DataSet = Configs.DataSet
+jobs_inner = max(1, Configs.executer_num)
 
+def safe_eval(fn, ind, idx):
+    #np.random.seed(os.getpid() & 0xFFFF)
+    return fn(ind, idx)
 
-# 定義 EDGWO
+def parallel_eval(fn, pop):
+    with Parallel(n_jobs=jobs_inner, backend="threading", verbose=0) as parallel:
+        return np.array(
+            parallel(delayed(safe_eval)(fn, ind, i)
+                     for i, ind in enumerate(pop))
+        )
+
 class EDGWO:
     def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
-        self.obj_function = obj_function  # 目標函數
-        self.dim = dim                    # 變數維度
-        self.lb = np.array(lb)            # 下界
-        self.ub = np.array(ub)            # 上界
-        self.num_pop = num_pop      # 狼群數量
-        self.max_iter = max_iter          # 最大迭代次數
-        self.f_type = f_type              # 連續/離散問題
+        self.obj_function = obj_function
+        self.dim = dim
+        self.lb = np.array(lb)
+        self.ub = np.array(ub)
+        self.num_pop = num_pop
+        self.max_iter = max_iter
+        self.f_type = f_type
+        self.parallel = Parallel(n_jobs=jobs_inner, backend="threading", verbose=0)
 
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
             self.dim+=1
 
-        # 初始化狼群位置
         if init_population is None:
             self.wolves = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
         else:
             self.wolves = init_population
 
-        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim),\
-                                            np.random.uniform(self.lb, self.ub, self.dim),\
-                                            np.random.uniform(self.lb, self.ub, self.dim)
+        self.fitness = parallel_eval(self.obj_function, self.wolves)
+        best_idx = np.argmin(self.fitness)
+        self.alpha = self.wolves[best_idx].copy()
+        self.alpha_score = self.fitness[best_idx]
+        self.beta = self.wolves[np.argsort(self.fitness)[1]].copy()
+        self.beta_score = self.fitness[np.argsort(self.fitness)[1]]
+        self.delta = self.wolves[np.argsort(self.fitness)[2]].copy()
+        self.delta_score = self.fitness[np.argsort(self.fitness)[2]]
 
-        # 初始化狼群位置
-        self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
-    
-    # 三種全局探索
     def VectorComponentCalculation(self, a, index, Xm, targetlead):
         r1, r2 = np.random.rand(), np.random.rand()
         A, C = 2 * a * r1 - a, 2 * r2
@@ -44,70 +57,48 @@ class EDGWO:
         else:
             r3, r4 = np.random.rand(), np.random.rand()
             return targetlead - Xm - r3 * (self.lb + (self.ub-self.lb) * r4)
-            #return self.alpha - Xm - r3 * (self.lb + (self.ub-self.lb) * r4)
-        
+
     def optimize(self):
-        convergence_curve = []
+        convergence_curve = [self.alpha_score]
         for t in range(self.max_iter):
-            # 計算適應度並更新
+            trial_pop = np.zeros_like(self.wolves)
             mean_pos = np.mean(self.wolves, axis=0)
+            
             for i in range(self.num_pop):
-                fitness = self.obj_function(self.wolves[i])
-                if fitness < self.alpha_score:
-                    self.delta_score, self.delta = self.beta_score, self.beta.copy()
-                    self.beta_score, self.beta = self.alpha_score, self.alpha.copy()
-                    self.alpha_score, self.alpha = fitness, self.wolves[i].copy()
-                elif fitness < self.beta_score:
-                    self.delta_score, self.delta = self.beta_score, self.beta.copy()
-                    self.beta_score, self.beta = fitness, self.wolves[i].copy()
-                elif fitness < self.delta_score:
-                    self.delta_score, self.delta = fitness, self.wolves[i].copy()
-
-            # 動態調整 (Elite vs. Ordinary)
-            a = 2 - t * (2 / self.max_iter)
-
-            for i in range(self.num_pop):
-
-                """ # calcu;ating X1
-                r1, r2 = np.random.rand(), np.random.rand()
-                A1, C1 = 2 * a * r1 - a, 2 * r2
-                D_alpha = abs(C1 * self.alpha - self.wolves[i])
-                X1 = self.alpha - A1 * D_alpha """
-                X1 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.alpha)
-
-
-                """ # calculating X2
-                r1, r2 = np.random.rand(), np.random.rand()
-                A2, C2 = 2 * a * r1 - a, 2 * r2
-                D_beta = abs(C2 * self.beta - self.wolves[i])
-                X2 = self.beta - A2 * D_beta """
-                X2 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.beta)
-
-                """ # calculating X3
-                r1, r2 = np.random.rand(), np.random.rand()
-                A3, C3 = 2 * a * r1 - a, 2 * r2
-                D_delta = abs(C3 * self.delta - self.wolves[i])
-                X3 = self.delta - A3 * D_delta """
-                X3 = self.VectorComponentCalculation(a, index=i, Xm=mean_pos, targetlead=self.delta)
-
-
-                if (np.allclose(self.wolves[i], self.alpha) or np.allclose(self.wolves[i], self.beta) or np.allclose(self.wolves[i], self.delta)):
-                    self.wolves[i]=(X1 + X2 + X3) / 3
+                X1 = self.VectorComponentCalculation(2 - t*(2/self.max_iter), i, mean_pos, self.alpha)
+                X2 = self.VectorComponentCalculation(2 - t*(2/self.max_iter), i, mean_pos, self.beta)
+                X3 = self.VectorComponentCalculation(2 - t*(2/self.max_iter), i, mean_pos, self.delta)
+                
+                if (np.allclose(self.wolves[i], self.alpha) or 
+                    np.allclose(self.wolves[i], self.beta) or 
+                    np.allclose(self.wolves[i], self.delta)):
+                    trial_pop[i] = (X1 + X2 + X3) / 3
                 else:
                     if np.random.rand() < (0.5 * (1 - t / self.max_iter)):
-                        self.wolves[i] = (X1 + X2 + X3) / 3
+                        trial_pop[i] = (X1 + X2 + X3) / 3
                     else:
-                        r5 = np.random.rand()
-                        l = -1 + 2 * r5
-                        self.wolves[i] = self.alpha + np.linalg.norm(self.alpha - self.wolves[i]) * np.exp(l) * np.cos(2 * np.pi * l)
+                        l = -1 + 2 * np.random.rand()
+                        trial_pop[i] = self.alpha + np.linalg.norm(self.alpha - self.wolves[i]) * np.exp(l) * np.cos(2 * np.pi * l)
 
-                if self.f_type== 'd':# 限制範圍
-                    self.wolves[i][-1] = np.clip(self.wolves[i][-1], 1, DataSet.NN_K)
-                    self.wolves[i][:-1] = np.clip(self.wolves[i][:-1], DataSet.param_LB, DataSet.param_UB)
-                else:
-                    self.wolves[i] = np.clip(self.wolves[i], self.lb, self.ub)
+                trial_pop[i] = np.clip(trial_pop[i], self.lb, self.ub)
+                if self.f_type == 'd':
+                    trial_pop[i][-1] = np.clip(trial_pop[i][-1], 1, DataSet.NN_K)
+                    trial_pop[i][:-1] = np.clip(trial_pop[i][:-1], DataSet.param_LB, DataSet.param_UB)
 
+            trial_fitness = np.array(
+                self.parallel(delayed(safe_eval)(self.obj_function, ind, i) 
+                for i, ind in enumerate(trial_pop))
+            )
+            
+            improved = trial_fitness < self.fitness
+            self.wolves[improved] = trial_pop[improved]
+            self.fitness[improved] = trial_fitness[improved]
+            
+            best_idx = np.argmin(self.fitness)
+            self.alpha = self.wolves[best_idx].copy()
+            self.alpha_score = self.fitness[best_idx]
             convergence_curve.append(self.alpha_score)
+
         return self.alpha, self.alpha_score, convergence_curve, self.wolves
 
 class EDGWOCONTROL:
@@ -115,7 +106,6 @@ class EDGWOCONTROL:
     def __init__(self,MAX_ITER, NUM_WOLVES, FUNCTION=10):
         self.MAX_ITER = MAX_ITER
         self.NUM_WOLVES = NUM_WOLVES
-
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
         self.DIM= FUNCTION.dim
@@ -126,15 +116,4 @@ class EDGWOCONTROL:
         edgwo = EDGWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                     num_pop=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
         best_position, best_value, curve, wolves = edgwo.optimize()
-        
-        """ print("Best solution found:", best_position)
-        print("Best fitness:", best_value) """
-
-        if self.f_type == "d":
-            return (wolves, np.array(curve))
-        else:
-            return (wolves, np.log10(curve))
-
-
-if __name__ == '__main__':
-    pass
+        return (wolves, np.log10(curve)) if self.f_type != "d" else (wolves, np.array(curve))

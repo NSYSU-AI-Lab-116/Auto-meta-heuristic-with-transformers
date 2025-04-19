@@ -1,63 +1,73 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+from joblib import Parallel, delayed
 from src.meta_heuristic_algos.Config import Configs
-DataSet = Configs.DataSet
 
-# 定義 Sand Cat Swarm Optimization (SCSO)
+DataSet = Configs.DataSet
+jobs_inner = max(1, Configs.executer_num)
+
+def safe_eval(fn, ind, idx):
+    #np.random.seed(os.getpid() & 0xFFFF)
+    return fn(ind, idx)
+
+def parallel_eval(fn, pop):
+    with Parallel(n_jobs=jobs_inner, backend="threading", verbose=0) as parallel:
+        return np.array(
+            parallel(delayed(safe_eval)(fn, ind, i)
+            for i, ind in enumerate(pop))
+        )
+
 class SCSO:
     def __init__(self, obj_function, dim, lb, ub, num_pop, max_iter, f_type, init_population=None):
-        self.obj_function = obj_function  # 目標函數
-        self.dim = dim                    # 變數維度
-        self.lb = np.array(lb)            # 下界
-        self.ub = np.array(ub)            # 上界
-        self.num_pop = num_pop          # 沙貓數量
-        self.max_iter = max_iter          # 最大迭代次數
-        self.f_type = f_type              # 連續/離散問題
+        self.obj_function = obj_function
+        self.dim = dim
+        self.lb = np.array(lb)
+        self.ub = np.array(ub)
+        self.num_pop = num_pop
+        self.max_iter = max_iter
+        self.f_type = f_type
         
         if self.f_type == "d":
             self.ub = np.append(self.ub[:], DataSet.NN_K)
             self.lb = np.append(self.lb[:], 1)
             self.dim += 1
 
-        # 初始化沙貓位置
         if init_population is None:
-            self.cats = np.random.uniform(self.lb, self.ub,(self.num_pop, self.dim))
+            self.cats = np.random.uniform(self.lb, self.ub, (self.num_pop, self.dim))
         else:
             self.cats = init_population
 
-        self.best_cat = np.random.uniform(self.lb, self.ub, self.dim)
-        self.best_score = np.inf
+        self.fitness = parallel_eval(self.obj_function, self.cats)
+        best_idx = np.argmin(self.fitness)
+        self.best_cat = self.cats[best_idx].copy()
+        self.best_score = self.fitness[best_idx]
 
     def optimize(self):
         convergence_curve = []
         
         for t in range(self.max_iter):
-            # 計算適應度並更新最佳沙貓
-            for i in range(self.num_pop):
-                fitness = self.obj_function(self.cats[i])
-                if fitness < self.best_score:
-                    self.best_score = fitness
-                    self.best_cat = self.cats[i].copy()
+            current_fitness = parallel_eval(self.obj_function, self.cats)
+            min_idx = np.argmin(current_fitness)
+            if current_fitness[min_idx] < self.best_score:
+                self.best_score = current_fitness[min_idx]
+                self.best_cat = self.cats[min_idx].copy()
             
-            # 計算適應性參數 rG 和 R
             rG = 2 - (2 * t / self.max_iter)
             R = 2 * rG * np.random.rand() - rG
             
-            # 更新位置
             for i in range(self.num_pop):
                 r = rG * np.random.rand()
-                theta = np.random.uniform(-np.pi, np.pi)  # 隨機角度
+                theta = np.random.uniform(-np.pi, np.pi)
                 if abs(R) <= 1:
-                    # Exploitation: 逼近最佳位置
                     new_position = self.best_cat - r * np.random.rand() * (self.best_cat - self.cats[i]) * np.cos(theta)
                 else:
-                    # Exploration: 搜索新區域
                     new_position = r * (self.best_cat - np.random.rand() * self.cats[i])
                 
-                # 限制範圍
                 if self.f_type == "d":
                     new_position[-1] = np.clip(new_position[-1], 1, DataSet.NN_K)
                     new_position[:-1] = np.clip(new_position[:-1], DataSet.param_LB, DataSet.param_UB)
+                    self.cats[i] = new_position
                 else:
                     self.cats[i] = np.clip(new_position, self.lb, self.ub)
             
@@ -65,13 +75,11 @@ class SCSO:
         
         return self.best_cat, self.best_score, convergence_curve, self.cats
 
-
 class SCSOCONTROL:
     __name__ = "SCSO"
     def __init__(self, MAX_ITER, NUM_CATS, FUNCTION):
         self.MAX_ITER = MAX_ITER
         self.NUM_CATS = NUM_CATS
-
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
         self.DIM = FUNCTION.dim
@@ -88,36 +96,5 @@ class SCSOCONTROL:
         else:
             return (cats, np.log10(curve))
 
-
 if __name__ == '__main__':
-    """ funcs_by_year = {
-        "2021": ["F3", "F6", "F8", "F10"],
-        "2022": ["F4", "F7", "F8", "F9"]
-    }
-    DIM = 10
-    MAX_ITER = 500
-    NUM_CATS = 30
-
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year, func_name, DIM)
-            UB = function.ub
-            LB = function.lb
-            dim = function.dim
-            f = function.func
-
-            scso = SCSO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_pop=NUM_CATS, max_iter=MAX_ITER)
-            best_position, best_value, curve = scso.optimize()
-
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-
-            plt.figure(figsize=(8, 6))
-            plt.plot(np.log10(curve), label=f"CEC {year} {func_name}")
-            plt.xticks([i for i in range(0, MAX_ITER + 1, 50)])
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"SCSO Convergence {year}-{func_name}-{DIM}D")
-            plt.legend()
-            plt.show()
- """
+    pass
