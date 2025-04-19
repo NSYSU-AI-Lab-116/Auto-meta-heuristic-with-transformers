@@ -3,14 +3,18 @@
 from concurrent.futures import ProcessPoolExecutor
 import os
 from datetime import datetime
-from matplotlib import pyplot as plt
+
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
+import matplotlib.ticker as mticker
+import matplotlib as mpl
 
 from src.meta_heuristic_algos.Config import Configs
 from src.meta_heuristic_algos.Optimizer import HyperParameters, Optimizers
-from src.meta_heuristic_algos.hyperheuristic import HyperHeuristicTemplate
+from src.meta_heuristic_algos.hyperheuristic import HyperHeuristicTemplate, HyperEvaluationFunction
 
+mpl.rcParams['figure.dpi'] = 800 # 設定全域 PPI 為 300
 Color = Configs.Color
 DataSet = Configs.DataSet
 
@@ -145,24 +149,27 @@ class MAINCONTROL:
 
         try:
             with ProcessPoolExecutor() as executor:
-                futures = [executor.submit(HyperHeuristicTemplate(obj_function=obj_func,\
-                            hyper_iteration=self.iter,color=list(Color.color_set.values())[i%7]).start)\
+                futures = [executor.submit(
+                    HyperHeuristicTemplate(
+                        obj_function=self.obj_func,
+                        hyper_iteration=self.iter,
+                        color=list(Color.color_set.values())[i%7]).start)\
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
                     population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
-                    
-                
+
+
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime rror: {e}{Color.RESET}")
             self.logging(f"Runtime error: {e}")
 
         try:
             for i, (curve, population) in enumerate(zip(all_curves, all_history_population)):
-                print(f"{list(Color.color_set.values())[i%7]} Epoch {i+1} | Best fitness: {curve[-1]}{Color.RESET}")
-                print(f"{list(Color.color_set.values())[i%7]} Epoch {i+1} | Best solution: {population[-1]}{Color.RESET}")
+                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best fitness: {curve[-1]}{Color.RESET}")
+                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best solution: {population[-1]}{Color.RESET}")
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Result extract error: {e}{Color.RESET}")
             self.logging(f"Result extract error: {e}")
@@ -186,20 +193,20 @@ class MAINCONTROL:
 
         with open(os.path.join(self.folder_path, self.folder_name, "output.txt"), "a", encoding='utf-8') as f:
             for i in range(self.epochs):
-                f.write(f"Epoch {i+1} | Best fitness: {all_curves[i][-1]}\n")
-                f.write(f"Epoch {i+1} | Best solution: {all_history_population[i][-1]}\n")
+                f.write(f"Round {i+1} | Best fitness: {all_curves[i][-1]}\n")
+                f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
         try:
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
-            
+
             self.draw_curves(axes, all_curves)
             self.draw_combination(axes, all_curves, all_history_population)
             self.draw_best_solution(axes, all_curves)
-            self.draw_hypr_meta_compare(axes, all_history_population)
+            self.draw_hypr_meta_compare(axes, all_curves, all_history_population)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Plotting error: {e}{Color.RESET}")
             self.logging(f"Plotting error: {e}")
-        
+
         plt.tight_layout()
         fig_save_path = os.path.join(self.folder_path, self.folder_name, "figure.png")
         plt.savefig(fig_save_path)
@@ -211,16 +218,17 @@ class MAINCONTROL:
         """ draw the curves"""
         ax = axes[0, 0]
         for i, curve in enumerate(all_curves):
-            ax.plot(list(range(1,len(curve)+1)),curve, label=f"Epoch {i+1}", color=plt.get_cmap('inferno')(i/10))
-        ax.set_title("Fitnesses with different Epoch")
+            ax.plot(list(range(1,len(curve)+1)),curve, label=f"Round {i+1}", color=plt.get_cmap('inferno')(i/10))
+        ax.set_title("Fitnesses with different Rounds")
         ax.set_xlabel("Iterations")
         ax.set_ylabel("Fitness log10")
         ax.grid(True)
         ax.legend(title="Epochs", bbox_to_anchor=(1, 1))
+        ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))
 
     def draw_combination(self, axes, all_curves, all_history_population):
-        ax = axes[0, 1]
         """ draw the functoion combination of the best solution"""
+        ax = axes[0, 1]
         best_population = all_history_population[:,-1]
         population_dataframe = pd.DataFrame(
             {
@@ -242,28 +250,31 @@ class MAINCONTROL:
         width = 0.8
 
         label_register_set = set()
+
         for i, group in enumerate(groups):
             group_data = population_dataframe[population_dataframe['Epoch'] == group].sort_values(by='Priority')
             bottom = 0
             total_weight = HyperParameters.Parameters['meta_iter']/(group_data['Weight'].sum())
+            number_of_bars = len(group_data.columns)
             for index, row in group_data.iterrows():
-                weight = row['Weight']*total_weight
-                if weight < 10:
-                    continue
+                if number_of_bars-1 == index:
+                    weight = HyperParameters.Parameters['meta_iter'] - bottom
+                else:
+                    weight = row['Weight']*total_weight
                 if row['Param_name'] not in label_register_set:
                     ax.bar(x[i], weight, width, bottom=bottom,
                         color=color_map[row['Param_name']], label=row['Param_name'])
                     label_register_set.add(row['Param_name'])
                 else:
                     ax.bar(x[i], weight, width, bottom=bottom,
-                        color=color_map[row['Param_name']])                
+                        color=color_map[row['Param_name']])
                 bottom += weight
 
         ax.set_xticks(x)
         ax.set_xticklabels(groups)
-        ax.set_xlabel('Trial')
+        ax.set_xlabel('Round')
         ax.set_ylabel('Time')
-        ax.set_title('Function activation time for each Trial')
+        ax.set_title('Function activation time for each Round')
 
         handles, labels = axes[0, 1].get_legend_handles_labels()
         by_label = dict(zip(labels, handles))
@@ -289,7 +300,7 @@ class MAINCONTROL:
             color1 = plt.get_cmap('inferno')(10)
             line1, = ax.plot(x,first_reached, label="80% pos", color=color1)
             ax.set_title("Key value of convergence")
-            ax.set_xlabel("Epoch")
+            ax.set_xlabel("Round")
             ax.set_ylabel("Convergence to 80%", color=color1)
             ax.set_ylim(0, self.iter)
             ax.tick_params(axis='y', labelcolor=color1)
@@ -315,26 +326,49 @@ class MAINCONTROL:
             print(f"{time_now()}: {Color.RED}Error in convergence speed plot: {e}{Color.RESET}")
             self.logging(f"Error in convergence speed plot: {e}")
 
-    def draw_hypr_meta_compare(self, axes, all_history_population):
+    def draw_hypr_meta_compare(self, axes, all_curves, all_history_population):
         """ draw the population difference"""
         ax = axes[1, 1]
+        best_population = all_history_population[np.argmin(all_curves[:,-1]),-1]
+
+        meta_curves = None
         with ProcessPoolExecutor() as executor:
-            futures = [(idx, optname, executor.submit(
-                opt(
-                    HyperParameters.Parameters['meta_iter'], \
-                    HyperParameters.Parameters['num_metaheuristic'],
-                    self.obj_func
-                ).start))\
-                for idx, optname, opt in enumerate(Optimizers.metaheuristic_list.items())]
-            for idx, optname, future in futures:
-                try:
+            futures = [executor.submit(
+                HyperEvaluationFunction(
+                    self.obj_func, Color.GREEN).evaluate,
+                best_population, i, True) for i in range(30)]
+
+            for future in futures:
+                curve = future.result()
+                if meta_curves is None:
+                    meta_curves = curve
+                else:
+                    meta_curves = np.vstack((meta_curves,curve))
+
+
+        hyper_curve = np.average(meta_curves,axis=0)
+        try:
+            with ProcessPoolExecutor() as executor:
+                futures = [(idx, optname, executor.submit(
+                    opt(
+                        HyperParameters.Parameters['meta_iter'], \
+                        HyperParameters.Parameters['num_metaheuristic'],
+                        self.obj_func
+                    ).start))\
+                    for idx, (optname, opt) in enumerate(Optimizers.metaheuristic_list.items())]
+
+                for idx, optname, future in futures:
                     population, curve = future.result()
-                    ax.plot(list(range(1,len(result)+1)),result, label=f"Epoch {i+1}", color=plt.get_cmap('inferno')(i/10))
-                except Exception as e:
-                    print(f"{time_now()}: {Color.RED}Error in metaheuristic comparison: {e}{Color.RESET}")
-                    self.logging(f"Error in metaheuristic comparison: {e}")
-        for idx, optname, opt in enumerate(Optimizers.metaheuristic_list.items()):
-            opt(HyperParameters.Parameters['meta_iter'], HyperParameters.Parameters['num_metaheuristic'],self.obj_func).start()
+                    ax.plot(curve,
+                            label=f"{optname}", 
+                            color=plt.get_cmap('inferno')(idx/10))
+                ax.plot(hyper_curve, label="HYPER",
+                        color='red', zorder=10)
+                ax.legend(title="Heuristics", bbox_to_anchor=(1, 1))
+
+        except Exception as e:
+            print(f"{time_now()}: {Color.RED}Error in metaheuristic comparison: {e}{Color.RESET}")
+            self.logging(f"Error in metaheuristic comparison: {e}")
 
 if __name__ == '__main__':
 
