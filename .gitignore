@@ -1,6 +1,5 @@
 # mutual-gitignore
 exp_result/
-*Config.py
 
 # local configuration files
 .DS_Store
