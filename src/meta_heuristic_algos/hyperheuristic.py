@@ -81,5 +81,5 @@ class HyperEvaluationFunction:
             HyperParameters["num_individual"], self.obj_func).start(population_storage)
             curve = np.concatenate((curve, tmpcurve))
 
-        print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
+        #print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
         return curve[-1]

@@ -1,7 +1,9 @@
 """Model for Differential Evolution (DE) algorithm."""
 import numpy as np
+import time 
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
+Color = Configs.Color
 
 class DE:
     """ Differential Evolution algorithm for optimization."""
@@ -45,6 +47,7 @@ class DE:
                 self.gbest = self.population[i].copy()
 
         for iters in range(self.max_iter):
+            start_time = time.time()
             for i in range(self.num_par):
                 idxs = list(range(self.num_par))
                 idxs.remove(i)
@@ -77,7 +80,9 @@ class DE:
                         self.gbest_score = trial_fitness
                         self.gbest = trial.copy()
             convergence_curve.append(self.gbest_score)
-            # print(f"{self.color}Iteration {iters}/{self.max_iter}, Best Fitness: {self.gbest_score}")
+            if self.f_type == "hyperheuristic":
+                print(f"Iteration {iters+1}/{self.max_iter}, Best Fitness: {self.gbest_score}")
+                print(f"{Color.GREEN}time took: {time.time() - start_time:.2f} seconds{Color.RESET}")
         return self.gbest, self.gbest_score, convergence_curve, self.population
 
 

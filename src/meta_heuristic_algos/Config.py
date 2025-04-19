@@ -20,7 +20,8 @@ from optimizers.TABU import TSCONTROL """
 import opfunu as of
 class Configs:
     """ This class is the main configuration of the project"""
-    executer_num = 5
+    execution_type = "single" # ["single", "all"]
+    logmsg = ""
     class Color:
         """stores the color codes for the console"""
         color_set = {

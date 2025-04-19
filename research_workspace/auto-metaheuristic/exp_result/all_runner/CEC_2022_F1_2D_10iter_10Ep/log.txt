@@ -1,0 +1,1 @@
+[2025-04-19 11:19:10]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2022_F1_2D_10iter_10Ep/figure.png
