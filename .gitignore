@@ -1,5 +1,5 @@
 # mutual-gitignore
-exp_result/
+all_runner/
 
 # local configuration files
 .DS_Store
