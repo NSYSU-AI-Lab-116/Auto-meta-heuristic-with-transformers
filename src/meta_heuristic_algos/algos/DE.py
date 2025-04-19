@@ -1,6 +1,7 @@
 """Model for Differential Evolution (DE) algorithm."""
+import time
+import os
 import numpy as np
-import time 
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 Color = Configs.Color
@@ -110,6 +111,7 @@ class DECONTROL:
 
     def start(self, init_population=None):
         """ Start the DE optimization process. """
+        np.random.seed(os.getpid() + int(time.time()))
         de = DE(obj_function=self.f, dim=self.dim, lb=self.lb, ub=self.ub,
                 num_par=self.num_individual, max_iter=self.max_iter, f_type=self.f_type,
                 factor=self.factor, cross_rate=self.cross_rate, init_population=init_population)

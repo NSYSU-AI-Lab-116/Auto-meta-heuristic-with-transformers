@@ -151,6 +151,8 @@ class MAINCONTROL:
                     population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
+                    
+                
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime rror: {e}{Color.RESET}")
             self.logging(f"Runtime error: {e}")
@@ -185,8 +187,6 @@ class MAINCONTROL:
                 f.write(f"Epoch {i+1} | Best fitness: {all_curves[i][-1]}\n")
                 f.write(f"Epoch {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
-        all_curves = np.array(all_curves)
-        all_history_population = np.array(all_history_population, np.float32)
         fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 10))
 
         #################################################
@@ -205,7 +205,7 @@ class MAINCONTROL:
 
         #################################################
         #plotting the best solution with different epochs
-        best_population = np.array(all_history_population,dtype=np.float32)[:,-1]
+        best_population = np.array(all_history_population)[:,-1]
         population_dataframe = pd.DataFrame(
             {
                 "Epoch": np.repeat(range(len(all_curves)), HyperParameters.Parameters['num_metaheuristic']),
