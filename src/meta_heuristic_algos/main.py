@@ -227,16 +227,16 @@ class MAINCONTROL:
         for i, group in enumerate(groups):
             group_data = population_dataframe[population_dataframe['Epoch'] == group].sort_values(by='Priority')
             bottom = 0
-            #total_weight = self.iter/(group_data['Weight'].sum())
+            total_weight = self.iter/(group_data['Weight'].sum())
             for index, row in group_data.iterrows():
                 if row['Param_name'] not in label_register_set:
-                    axes[0, 1].bar(x[i], row['Weight'], width, bottom=bottom,
+                    axes[0, 1].bar(x[i], row['Weight']*total_weight, width, bottom=bottom,
                         color=color_map[row['Param_name']], label=row['Param_name'])
                     label_register_set.add(row['Param_name'])
                 else:
-                    axes[0, 1].bar(x[i], row['Weight'], width, bottom=bottom,
+                    axes[0, 1].bar(x[i], row['Weight']*total_weight, width, bottom=bottom,
                         color=color_map[row['Param_name']])                
-                bottom += row['Weight']
+                bottom += row['Weight']*total_weight
 
         axes[0, 1].set_xticks(x)
         axes[0, 1].set_xticklabels(groups)
