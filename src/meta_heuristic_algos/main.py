@@ -207,6 +207,7 @@ class MAINCONTROL:
             print(f"{time_now()}: {Color.RED}Plotting error: {e}{Color.RESET}")
             self.logging(f"Plotting error: {e}")
 
+        fig.suptitle(f"{self.f_type}-{self.year}-{self.name}-{self.dim}D-{self.iter}iter-{self.epochs}Round", fontsize=16)
         plt.tight_layout()
         fig_save_path = os.path.join(self.folder_path, self.folder_name, "figure.png")
         plt.savefig(fig_save_path)
