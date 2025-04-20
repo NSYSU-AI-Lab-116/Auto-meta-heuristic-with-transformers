@@ -42,7 +42,7 @@ class HyperParameters :
     # heurictic and hyperheuristic parameters
     Parameters = {
         "meta_iter": 500,
-        "hyper_iter": 300,
+        "hyper_iter": 500,
         "epoch": 10,
         "f_type": "continue",
         "num_metaheuristic": len(Optimizers.metaheuristic_list),

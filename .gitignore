@@ -1,6 +1,8 @@
 # mutual-gitignore
 all_runner/
-
+*log*
+*output*
+config.txt
 # local configuration files
 .DS_Store
 .vscode/
