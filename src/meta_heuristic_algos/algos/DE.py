@@ -14,7 +14,7 @@ def safe_eval(fn, ind, idx):
 
 
 def parallel_eval(fn, pop):
-    with Parallel(n_jobs=jobs_inner, backend="loky", verbose=0) as parallel:
+    with Parallel(n_jobs=jobs_inner, backend="threading", verbose=0) as parallel:
         return np.array(
             parallel(delayed(safe_eval)(fn, ind, i)
                      for i, ind in enumerate(pop))
@@ -45,7 +45,7 @@ class DE:
         self.f_type = f_type
         self.factor = factor  # scaling factor
         self.cross_rate = cross_rate  # cross rate
-        self.parallel = Parallel(n_jobs=jobs_inner, backend="loky", verbose=0)
+        self.parallel = Parallel(n_jobs=jobs_inner, backend="threading", verbose=0)
 
         if self.f_type == "d":
             self.ub = np.append(self.ub, DataSet.NN_K)
