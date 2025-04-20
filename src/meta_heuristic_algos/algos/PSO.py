@@ -37,6 +37,7 @@ class PSO:
         convergence_curve = []
 
         for t in range(self.max_iter):
+            self.w = 0.9 - (t / self.max_iter) * 0.5  # 從 0.9 遞減到 0.4
             for i in range(self.num_par):
                 fitness = self.obj_function(self.particles[i])
                 

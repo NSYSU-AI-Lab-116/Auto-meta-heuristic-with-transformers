@@ -31,13 +31,13 @@ class HyperEvaluationFunction:
         :param obj_function: the objective function to be optimized 
         :param color: the color for output display
     """
-    def __init__(self, obj_function, color):
+    def __init__(self, obj_function, color, f_type="hyperheuristic"):
         self.obj_func = obj_function
         self.dim = len(optimizers) * HyperParameters["num_param_each"]
         self.lb = HyperParameters["lb"]
         self.ub = HyperParameters["ub"]
         self.func = self.evaluate
-        self.f_type = "hyperheuristic"
+        self.f_type = f_type
         self.color = color
 
     def evaluate(self, param_list: list, idx: int, return_curve = False) -> float:
@@ -76,6 +76,7 @@ class HyperEvaluationFunction:
         split_list[-1] = HyperParameters["meta_iter"] - np.sum(split_list[:-1]) - 1
         population_storage = None
         curve = np.array([])
+
 
         for i, iteration in enumerate(split_list):
             population_storage, tmpcurve = optimizer_list[i](iteration,
