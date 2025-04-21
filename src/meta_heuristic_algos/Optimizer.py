@@ -18,18 +18,18 @@ from src.meta_heuristic_algos.algos.TABU import TSCONTROL
 class Optimizers:
     """ This class stores all the metaheuristic algorithms"""
     metaheuristic_list = {
-        "EDGWO": EDGWOCONTROL,
+        #"EDGWO": EDGWOCONTROL,
         "GWO": GWOCONTROL,
         "CHGWOSCA": CHGWOSCACONTROL,
-        "REEGWO": REEGWOCONTROL,
-        "MSGWO": MSGWOCONTROL,
+        #"REEGWO": REEGWOCONTROL,
+        #"MSGWO": MSGWOCONTROL,
         "BES": BESCONTROL,
-        #"ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
+        "ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
         "PSO" :PSOCONTROL,
         "HHO" :HHOCONTROL,
         "SCSO":SCSOCONTROL,
         #"REINEDGWO": REINEDGWOCONTROL,
-        #"DE": DECONTROL,
+        "DE": DECONTROL,
         "GA": GACONTROL,
         #"SA": SACONTROL, # issue: type nd.numpyfloat64 has no attribute 'len()'
         #"TABU": TSCONTROL # issue: type nd.numpyfloat64 has no attribute 'len()'
@@ -43,10 +43,10 @@ class HyperParameters :
     Parameters = {
         "meta_iter": 500,
         "hyper_iter": 500,
-        "epoch": 10,
+        "epoch": 6,
         "f_type": "continue",
         "num_metaheuristic": len(Optimizers.metaheuristic_list),
-        "num_individual": 30,
+        "num_individual": 20,
         "num_param_each": 2,
         "ub": [10,10]*len(Optimizers.metaheuristic_list),
         "lb": [0,0]*len(Optimizers.metaheuristic_list),

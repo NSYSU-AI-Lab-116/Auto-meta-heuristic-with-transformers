@@ -356,19 +356,26 @@ class MAINCONTROL:
 
             hyper_curve = np.average(meta_curves,axis=0)
             with ProcessPoolExecutor() as executor:
-                futures = [(idx, optname, executor.submit(
+                meta_curves = None
+                
+                for idx, (optname, opt) in enumerate(Optimizers.metaheuristic_list.items()):
+                    futures = [(executor.submit(
                     opt(
                         HyperParameters.Parameters['meta_iter'], \
                         HyperParameters.Parameters['num_individual'], \
                         self.obj_func
-                    ).start))\
-                    for idx, (optname, opt) in enumerate(Optimizers.metaheuristic_list.items())]
-
-                for idx, optname, future in futures:
-                    population, curve = future.result()
-                    ax.plot(curve,
+                    ).start))for trial in range(5)]
+                    single_curves = None
+                    for future in futures:
+                        pop , curve = future.result()
+                        if single_curves is None:
+                            single_curves = curve
+                        else:
+                            single_curves = np.vstack((single_curves,curve))
+                    ax.plot(np.average(single_curves,axis=0),
                             label=f"{optname}", 
                             color=plt.get_cmap('inferno')(idx/10), linestyle='--', marker='o', markersize=1, linewidth=0.5)
+
                 ax.plot(hyper_curve, label="HYPER",
                         color='red', zorder=10, linestyle='--', marker='x', markersize=3, linewidth=0.5)
             
