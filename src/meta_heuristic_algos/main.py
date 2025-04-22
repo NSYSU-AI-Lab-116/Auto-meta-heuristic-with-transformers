@@ -53,7 +53,7 @@ class MAINCONTROL:
         """ get all the functions from the dataset"""
         funcs_by_year = DataSet().all_funcs
         for f_type, years in funcs_by_year.items():
-            for year, names in list(years.items())[-1:-6:-1]:
+            for year, names in list(years.items())[-4:-7:-1]:
                 for name in names:
                     self.f_type = f_type
                     self.year = year
@@ -191,6 +191,7 @@ class MAINCONTROL:
             f.write(f"Dimension: {self.dim}\n")
             f.write(f"Iterations: {self.iter}\n")
             f.write(f"Epochs: {self.epochs}\n")
+            f.write(f"num_individual: {HyperParameters.Parameters['num_individual']}\n")
 
         with open(os.path.join(self.folder_path, self.folder_name, "output.txt"), "a", encoding='utf-8') as f:
             for i in range(self.epochs):
