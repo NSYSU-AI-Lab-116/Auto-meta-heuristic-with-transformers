@@ -3,6 +3,7 @@ all_runner/
 *log*
 *output*
 config.txt
+old_data/
 # local configuration files
 .DS_Store
 .vscode/
