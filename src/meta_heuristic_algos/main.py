@@ -33,16 +33,16 @@ class MAINCONTROL:
         self.epochs = HyperParameters.Parameters["epoch"]
         self.iter = HyperParameters.Parameters["hyper_iter"]
         self.obj_func = None    
-        if Configs.execution_type == "single":
-            self.f_type, self.year, self.name, self.dim, self.iter, self.epochs = self.get_args()
-            #self.f_type, self.year, self.name, self.dim, self.iter, self.epochs = "CEC", "2022", "F12", 2, 500, 10
-            HyperParameters.Parameters["epoch"] = self.epochs
-            self.folder_path = os.path.join(os.getcwd(), "research_workspace", "auto-metaheuristic", "exp_result", "all_runner")
-            self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
-            os.system(f'mkdir {os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/all_runner/{self.folder_name}')
-            self.create_hyperheuristic_instance()
-        elif Configs.execution_type == "all":
-            self.all_func()
+        try:
+            if Configs.execution_type == "single":
+                self.get_args()
+            elif Configs.execution_type == "all" :
+                self.all_func()
+            elif Configs.execution_type == "year":
+                self.year_func(Configs.exec_year)
+        except Exception as e:
+            print(f"{time_now()}: {Color.RED}Runtime Error: {e}{Color.RESET}")
+            self.logging(f"Runtime Error: {e}")
 
     def logging(self,msg):
         """ log the data"""
@@ -53,29 +53,31 @@ class MAINCONTROL:
         """ get all the functions from the dataset"""
         funcs_by_year = DataSet().all_funcs
         for f_type, years in funcs_by_year.items():
-            for year, names in list(years.items())[-4:-7:-1]:
+            for year, names in list(years.items())[::-1]:
                 for name in names:
-                    self.f_type = f_type
-                    self.year = year
-                    self.name = name
                     try:
                         idx = names[name].index('10')
                         self.dim = names[name][idx]
+                        self.create_hyperheuristic_instance(f_type, year, name, names[name][idx])
                     except:
                         self.dim = names[name][0]
+                        self.create_hyperheuristic_instance(f_type, year, name, names[name][0])
 
-                    self.folder_path = os.path.join(os.getcwd(), "research_workspace", "auto-metaheuristic", "exp_result", "all_runner")
-                    self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
-                    print(f"{Color.MAGENTA}DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}{Color.RESET}\n")
-                    print(f"{Color.MAGENTA}Iter: {self.iter} -  Epoch: {self.epochs}{Color.RESET}\n")
-                    os.system(f'mkdir {os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/all_runner/{self.folder_name}')
-                    self.logging(f"Running DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
-                    try:
-                        self.create_hyperheuristic_instance()
-                        self.logging(f"Finished!: DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
-                    except Exception as e:
-                        print(f"{time_now()}: {Color.RED}Error: {e}{Color.RESET}")
-                        self.logging(f"Runtime Error: {e}")
+    def year_func(self, year):
+        funcs_by_year = DataSet().all_funcs
+        for f_type, years in funcs_by_year.items():
+            try:
+                names = years[year]
+            except:
+                raise ValueError("Invalid year")
+            for name in names:
+                try:
+                    idx = names[name].index('10')
+                    self.dim = names[name][idx]
+                    self.create_hyperheuristic_instance(f_type, year, name, names[name][idx])
+                except:
+                    self.dim = names[name][0]
+                    self.create_hyperheuristic_instance(f_type, year, name, names[name][0])
  
     def get_args(self):
         """ get the args from the user"""
@@ -126,19 +128,27 @@ class MAINCONTROL:
                 epochs = int(input(f"{Color.BLUE}Input Epochs(10): {Color.RESET}"))
                 if iterations <= 0 or epochs <= 0:
                     raise ValueError("Iterations and epochs must be positive integers.")
-
-            except ValueError as e:
-                print(f"{Color.RED}Invalid input:{e}{Color.RESET}")
-                continue
             except Exception as e:
                 print(f"{Color.RED}Invalid input:{e}{Color.RESET}")
                 continue
+            
+            self.iter = iterations
+            self.epochs = epochs
+            self.create_hyperheuristic_instance(f_type, year, name, dim)
 
-            return f_type, year, name, dim, iterations, epochs
-        return None
-
-    def create_hyperheuristic_instance(self):
+    def create_hyperheuristic_instance(self, f_type=None, year=None, name=None, dim=None):
         """ create the hyper heuristic"""
+        self.f_type = f_type
+        self.year = year
+        self.name = name
+        self.dim = dim
+        self.folder_path = os.path.join(os.getcwd(), "research_workspace", "auto-metaheuristic", "exp_result", "all_runner")
+        self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
+        print(f"{Color.MAGENTA}DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}{Color.RESET}\n")
+        print(f"{Color.MAGENTA}Iter: {self.iter} -  Epoch: {self.epochs}{Color.RESET}\n")
+        os.system(f'mkdir {os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/all_runner/{self.folder_name}')
+        self.logging(f"Running DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
+        
         try:
             self.obj_func = DataSet.get_function(self.f_type, self.year, self.name, int(self.dim))
         except Exception as e:
@@ -180,6 +190,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Record and analyze error: {e}{Color.RESET}")
             self.logging(f"Record error: {e}")
+        self.logging(f"Finished!: DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
 
     def record_and_analize(self, all_curves, all_history_population):
         """ plot the chart"""
@@ -393,11 +404,15 @@ class MAINCONTROL:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Metaheuristic Algorithm Runner")
-    parser.add_argument('--exec', type=str, default='single', choices=['single', 'all'],
+    parser.add_argument('--exec', type=str, default='single', choices=['single', 'all', "year"],
                         help="Execution type: single or all")
+    parser.add_argument('--year', type=str, default='2022',
+                        help="Year of the function to run")
     args = parser.parse_args()
-    Configs.execution_type = args.exec
     
+    Configs.execution_type = args.exec
+    if Configs.execution_type == "year":
+        Configs.exec_year = args.year
     MAINCONTROL()
 
     print(f"{Color.RED}Quitting...{Color.RESET}")
