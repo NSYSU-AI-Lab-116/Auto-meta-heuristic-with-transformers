@@ -33,6 +33,7 @@ class MAINCONTROL:
         self.epochs = HyperParameters.Parameters["epoch"]
         self.iter = HyperParameters.Parameters["hyper_iter"]
         self.obj_func = None    
+        self.plot_scale = "Linear"
         try:
             if Configs.execution_type == "single":
                 self.get_args()
@@ -210,6 +211,18 @@ class MAINCONTROL:
                 f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
         try:
+            try:
+                self.plot_scale = "Log10"
+                all_curves = np.log10(np.array(all_curves))
+                if np.isnan(all_curves).any():
+                    raise ValueError("Log10 of fitness values resulted in NaN")
+            except Exception as e:
+                print(f"{time_now()}: {Color.RED}Log10 error: {e}{Color.RESET}")
+                self.logging(f"Log10 error: {e}")
+                all_curves = np.array(all_curves)
+                self.plot_scale = "Linear"
+                
+            
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
 
             self.draw_curves(axes, all_curves)
@@ -234,7 +247,7 @@ class MAINCONTROL:
             ax.plot(list(range(1,len(curve)+1)),curve, label=f"Round {i+1}", color=plt.get_cmap('inferno')(i/10), linestyle='--')
         ax.set_title("Fitnesses with different Rounds")
         ax.set_xlabel("Times of evaluation")
-        ax.set_ylabel("Fitness log10")
+        ax.set_ylabel(f"Fitness {self.plot_scale}")
         ax.grid(True)
         ax.legend(title="Round", bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))
@@ -392,7 +405,7 @@ class MAINCONTROL:
             
 
             ax.set_xlabel('Times of evaluation')
-            ax.set_ylabel('Fitness log10')
+            ax.set_ylabel(f'Fitness {self.plot_scale}')
             ax.set_title('Compare of metaheuristic algorithms')
             ax.legend(title="Heuristics", bbox_to_anchor=(1.05, 1), loc='upper left') 
         except Exception as e:

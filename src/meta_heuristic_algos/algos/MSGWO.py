@@ -112,7 +112,7 @@ class MSGWOCONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (wolves, np.log10(curve))
+            return (wolves, curve)
 
 
 

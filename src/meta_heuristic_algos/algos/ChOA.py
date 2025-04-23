@@ -120,9 +120,9 @@ class ChOACONTROL:
         best_position, best_value, curve, chimps = choa.optimize()
 
         if(self.f_type == "d"):
-            return (chimps, np.array(np.abs(curve) + 1e-8))
+            return (chimps, np.array(np.abs(curve)))
         else:
-            return (chimps, np.log10(np.abs(curve) + 1e-8))  # 避免 log(0) 錯誤
+            return (chimps, curve)  # 避免 log(0) 錯誤
 
 
 if __name__ == '__main__':

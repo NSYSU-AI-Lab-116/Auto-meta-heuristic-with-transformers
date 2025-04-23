@@ -89,7 +89,10 @@ class PSOCONTROL:
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-            return (particles, np.log10(curve))
+            """ with open("pso_curve.txt", "a") as f:
+                for i in range(len(curve)):
+                    f.write(f"{curve[i]}\n") """
+            return (particles, curve)
 
 
 

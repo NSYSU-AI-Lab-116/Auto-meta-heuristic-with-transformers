@@ -106,7 +106,7 @@ class GACONTROL:
         if self.f_type == "d":
             return (population, np.array(curve))
         else:
-            return (population, np.log10(curve))
+            return (population, curve)
 
 if __name__ == '__main__':
     """ funcs_by_year = DataSet.funcs_years
