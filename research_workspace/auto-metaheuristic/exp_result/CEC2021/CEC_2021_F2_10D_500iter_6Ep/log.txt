@@ -1,0 +1,11 @@
+[2025-04-22 11:42:23]: Running DataSet: CEC-2021-F2 - Dimension: 10
+[2025-04-22 14:10:58]: Error in convergence speed plot: Axis limits cannot be NaN or Inf
+[2025-04-22 14:11:03]: Metaheuristic comparison: [[3.56001822 3.37245176 3.38772558 ... 2.02814818 2.02400522 2.0235644 ]
+ [3.56001822 3.37245176 3.38772558 ... 2.34917422 2.34917422 2.34917422]
+ [3.56001822 3.37245176 3.38772558 ... 2.696378   2.696378   2.696378  ]
+ ...
+ [2.7369222  3.49401652 3.47240569 ...        nan        nan        nan]
+ [2.82362306 3.39541539 3.49987416 ...        nan        nan        nan]
+ [3.28613202 3.43449329 3.62770974 ... 2.87398019 2.87398019 2.85049299]]
+[2025-04-22 14:11:24]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F2_10D_500iter_6Ep/figure.png
+[2025-04-22 14:11:24]: Finished!: DataSet: CEC-2021-F2 - Dimension: 10
