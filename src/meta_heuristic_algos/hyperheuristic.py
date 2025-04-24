@@ -40,7 +40,7 @@ class HyperEvaluationFunction:
         self.f_type = f_type
         self.color = color
 
-    def evaluate(self, param_list: list, idx: int, return_curve = False) -> float:
+    def evaluate(self, param_list: list, idx=0, return_curve = False) -> float:
         """ This function is called when this class instance is called
         :param individual: list of parameters
         :param idx: index of the individual

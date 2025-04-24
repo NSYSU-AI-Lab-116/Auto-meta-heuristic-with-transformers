@@ -42,7 +42,7 @@ class DE:
         convergence_curve = []
 
         for i in range(self.num_par):
-            self.fitness[i] = self.obj_function(self.population[i], i)
+            self.fitness[i] = self.obj_function(self.population[i])
             if self.fitness[i] < self.gbest_score:
                 self.gbest_score = self.fitness[i]
                 self.gbest = self.population[i].copy()
@@ -72,7 +72,7 @@ class DE:
                 else:
                     trial = np.clip(trial, self.lb, self.ub)
 
-                trial_fitness = self.obj_function(trial,i)
+                trial_fitness = self.obj_function(trial)
                 # verify trial solution
                 if trial_fitness < self.fitness[i]:
                     self.population[i] = trial
@@ -120,7 +120,7 @@ class DECONTROL:
         if self.f_type == "d":
             return (population, np.array(curve))
         else:
-            return (population, np.log10(curve))
+            return (population, curve)
 
 if __name__ == '__main__':
     pass

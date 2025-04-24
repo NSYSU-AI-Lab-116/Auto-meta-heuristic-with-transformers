@@ -100,7 +100,7 @@ class BESCONTROL:
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-            return (particles, np.log10(curve))
+            return (particles, curve)
 
 
 

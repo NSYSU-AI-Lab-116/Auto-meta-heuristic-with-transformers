@@ -86,7 +86,7 @@ class SCSOCONTROL:
         if self.f_type == "d":
             return (cats, np.array(curve))
         else:
-            return (cats, np.log10(curve))
+            return (cats, curve)
 
 
 if __name__ == '__main__':

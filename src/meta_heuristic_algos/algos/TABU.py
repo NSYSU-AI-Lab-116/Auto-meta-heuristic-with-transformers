@@ -125,7 +125,7 @@ class TSCONTROL:
         if self.f_type == "d":
             return (updated_population, np.array(curve))
         else:
-            return (updated_population, np.log10(curve))
+            return (updated_population, curve)
 
 if __name__ == '__main__':
     """ funcs_by_year = DataSet.funcs_years
