@@ -22,7 +22,6 @@ class DE:
         self.factor = factor      # scaling factor
         self.cross_rate = cross_rate    # cross rate
 
-
         if self.f_type == "d":
             self.ub = np.append(self.ub, DataSet.NN_K)
             self.lb = np.append(self.lb, 1)
@@ -36,6 +35,8 @@ class DE:
         self.fitness = np.array([np.inf] * self.num_par)
         self.gbest = None
         self.gbest_score = np.inf
+        
+        self.best_population = None
 
     def optimize(self):
         """Optimize the population using DE algorithm."""
@@ -49,6 +50,7 @@ class DE:
 
         for iters in range(self.max_iter):
             start_time = time.time()
+            current_best = False
             for i in range(self.num_par):
                 idxs = list(range(self.num_par))
                 idxs.remove(i)
@@ -80,11 +82,14 @@ class DE:
                     if trial_fitness < self.gbest_score:
                         self.gbest_score = trial_fitness
                         self.gbest = trial.copy()
+                        if not current_best:
+                            self.best_population = self.population.copy()
+                            current_best = True
             convergence_curve.append(self.gbest_score)
             if self.f_type == "hyperheuristic":
                 print(f"Iteration {iters+1}/{self.max_iter}, Best Fitness: {self.gbest_score}")
                 print(f"{Color.GREEN}time took: {time.time() - start_time:.2f} seconds{Color.RESET}")
-        return self.gbest, self.gbest_score, convergence_curve, self.population
+        return self.best_population, self.gbest, self.gbest_score, convergence_curve, self.population
 
 
 class DECONTROL:
@@ -115,12 +120,12 @@ class DECONTROL:
         de = DE(obj_function=self.f, dim=self.dim, lb=self.lb, ub=self.ub,
                 num_par=self.num_individual, max_iter=self.max_iter, f_type=self.f_type,
                 factor=self.factor, cross_rate=self.cross_rate, init_population=init_population)
-        best_position, best_value, curve, population = de.optimize()
+        best_population, best_position, best_value, curve, population = de.optimize()
 
         if self.f_type == "d":
-            return (population, np.array(curve))
+            return (best_position, best_value, population, np.array(curve))
         else:
-            return (population, curve)
+            return (best_population, best_position, best_value, population, curve)
 
 if __name__ == '__main__':
     pass

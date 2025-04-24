@@ -4,6 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 import os
 from datetime import datetime
 import argparse
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -43,7 +44,8 @@ class MAINCONTROL:
                 self.year_func(Configs.exec_year)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime Error: {e}{Color.RESET}")
-            self.logging(f"Runtime Error: {e}")
+            traceback.print_exc()
+            self.logging(f"Runtime Error in init: {e}")
 
     def logging(self,msg):
         """ log the data"""
@@ -169,7 +171,7 @@ class MAINCONTROL:
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
-                    population, curve = future.result()
+                    best_populstion, best_individual, best_score, population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
 
@@ -177,6 +179,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime rror: {e}{Color.RESET}")
             self.logging(f"Runtime error: {e}")
+            traceback.print_exc()
 
         try:
             for i, (curve, population) in enumerate(zip(all_curves, all_history_population)):
@@ -213,14 +216,16 @@ class MAINCONTROL:
         try:
             try:
                 self.plot_scale = "Log10"
-                all_curves = np.log10(np.array(all_curves))
+                tmp = np.log10(np.array(all_curves))
                 if np.isnan(all_curves).any():
                     raise ValueError("Log10 of fitness values resulted in NaN")
             except Exception as e:
                 print(f"{time_now()}: {Color.RED}Log10 error: {e}{Color.RESET}")
                 self.logging(f"Log10 error: {e}")
-                all_curves = np.array(all_curves)
+                tmp = np.array(all_curves)
                 self.plot_scale = "Linear"
+            finally:
+                all_curves = np.nan_to_num(tmp)
                 
             
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
@@ -388,7 +393,7 @@ class MAINCONTROL:
                         HyperParameters.Parameters['meta_iter'], \
                         HyperParameters.Parameters['num_individual'], \
                         self.obj_func
-                    ).start))for trial in range(5)]
+                    ).start))for trial in range(30)]
                     single_curves = None
                     for future in futures:
                         pop , curve = future.result()

@@ -128,7 +128,7 @@ class REINEDGWOCONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (wolves, curve)
+            return (best_position, best_value, wolves, curve)
     
 if __name__ == '__main__':
     """ funcs_by_year = DataSet.funcs_years

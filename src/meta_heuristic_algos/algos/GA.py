@@ -29,6 +29,7 @@ class GA:
         best_idx = np.argmin(self.fitness)
         self.gbest = self.population[best_idx].copy()
         self.gbest_score = self.fitness[best_idx]
+        self.best_population = None
 
     def selection(self, selection_size=3):
         indices = np.random.choice(self.pop_size, selection_size, replace=False)
@@ -81,9 +82,10 @@ class GA:
             if self.fitness[gen_best_idx] < self.gbest_score:
                 self.gbest_score = self.fitness[gen_best_idx]
                 self.gbest = self.population[gen_best_idx].copy()
+                self.best_population = self.population.copy()
 
             convergence_curve.append(self.gbest_score)
-        return self.gbest, self.gbest_score, convergence_curve, self.population
+        return self.best_population, self.gbest, self.gbest_score, convergence_curve, self.population
 
 class GACONTROL:
     __name__ = "GA"
@@ -101,12 +103,12 @@ class GACONTROL:
         ga = GA(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                 pop_size=self.POP_SIZE, max_iter=self.MAX_ITER, f_type=self.f_type,
                 mutation_rate=self.mutation_rate, init_population=init_population)
-        best_position, best_value, curve, population = ga.optimize()
+        best_population, best_position, best_value, curve, population = ga.optimize()
         
         if self.f_type == "d":
             return (population, np.array(curve))
         else:
-            return (population, curve)
+            return (best_population, best_position, best_value, population, curve)
 
 if __name__ == '__main__':
     """ funcs_by_year = DataSet.funcs_years

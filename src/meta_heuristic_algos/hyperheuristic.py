@@ -1,5 +1,6 @@
 """This script is the main script of handling the hyperheuristic algorithm."""
 import numpy as np
+import traceback
 from src.meta_heuristic_algos.Config import Configs
 from src.meta_heuristic_algos.Optimizer import Optimizers
 from src.meta_heuristic_algos.Optimizer import HyperParameters as HyperParameterClass
@@ -75,14 +76,22 @@ class HyperEvaluationFunction:
         split_list = np.int32(param_list[:, 1] / total_split * HyperParameters["meta_iter"])
         split_list[-1] = HyperParameters["meta_iter"] - np.sum(split_list[:-1]) - 1
         population_storage = None
+        best_population = None
         curve = np.array([])
+        best_value = np.inf
 
-
-        for i, iteration in enumerate(split_list):
-            population_storage, tmpcurve = optimizer_list[i](iteration,
-            HyperParameters["num_individual"], self.obj_func).start(population_storage)
-            curve = np.concatenate((curve, tmpcurve))
+        try:
+            for i, iteration in enumerate(split_list):
+                best_population, best_individual, best_value_temp, population_storage, tmpcurve = optimizer_list[i](iteration,
+                HyperParameters["num_individual"], self.obj_func).start(best_population)
+                curve = np.concatenate((curve, tmpcurve))
+                best_value = min(best_value, best_value_temp)
+        except Exception as e:
+            print(f"Error in optimizer {optimizer_names[i]} with parameters {param_list[i]}")
+            print(f"Error: {e}")
+            traceback.print_exc()
+            raise Exception(f"Error in optimizer {optimizer_names[i]} with parameters {param_list[i]}") from e
         #print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
         if return_curve:
             return curve
-        return curve[-1]
+        return best_value
