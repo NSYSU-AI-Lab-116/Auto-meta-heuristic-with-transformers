@@ -40,17 +40,15 @@ class HHO:
     def optimize(self):
         convergence_curve = []
         for t in range(self.max_iter):
-            
-            # 計算適應度並找出最好的解（獵物）
             for i in range(self.num_hawks):
                 fitness = self.obj_function(self.hawks[i])
                 if fitness < self.best_score:
                     self.best_score = fitness
                     self.best_position = self.hawks[i].copy()
             
-            E0 = 2 * np.random.rand() - 1  # 初始逃脫能量
+            E0 = 2 * np.random.rand() - 1
             for i in range(self.num_hawks):
-                E = 2 * E0 * (1 - (t / self.max_iter))  # 能量衰減
+                E = 2 * E0 * (1 - (t / self.max_iter))
                 r = np.random.rand()
                 J = 2 * (1 - np.random.rand())
                 LF = levy_flight(self.dim)
@@ -76,12 +74,13 @@ class HHO:
                         Z = Y + np.random.rand(self.dim) * LF
                         self.hawks[i] = Z if self.obj_function(Z) < self.obj_function(Y) else Y
                 
-                if self.f_type=='d':# 邊界限制
+                if self.f_type == 'd':
                     self.hawks[i][-1] = np.clip(self.hawks[i][-1], 1, DataSet.NN_K)
                     self.hawks[i][:-1] = np.clip(self.hawks[i][:-1], DataSet.param_LB, DataSet.param_UB)
                 else:
                     self.hawks[i] = np.clip(self.hawks[i], self.lb, self.ub)
-            
+
+            self.hawks[-1] = self.best_position.copy()
             convergence_curve.append(self.best_score)
         
         return self.best_position, self.best_score, convergence_curve, self.hawks

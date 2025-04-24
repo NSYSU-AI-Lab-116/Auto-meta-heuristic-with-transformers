@@ -1,4 +1,3 @@
-"""This script is the main script of handling the hyperheuristic algorithm."""
 import numpy as np
 from src.meta_heuristic_algos.Config import Configs
 from src.meta_heuristic_algos.Optimizer import Optimizers
@@ -48,7 +47,8 @@ class HyperEvaluationFunction:
         """
 
         param_list = np.int8(np.copy(param_list).reshape((len(optimizers),
-                                            HyperParameters["num_param_each"])))
+                                            HyperParameters["num_param_each"]))
+        )
         optimizer_list = np.array(list(optimizers.values()), dtype=object)
         optimizer_names = np.array(list(optimizers.keys()), dtype=object)
         keep_filter = param_list[:, 1] > 0
@@ -71,17 +71,31 @@ class HyperEvaluationFunction:
         if total_split == 0:
             return np.inf
 
-
         split_list = np.int32(param_list[:, 1] / total_split * HyperParameters["meta_iter"])
         split_list[-1] = HyperParameters["meta_iter"] - np.sum(split_list[:-1]) - 1
         population_storage = None
         curve = np.array([])
-
+        global_elite = None
+        global_elite_value = np.inf
 
         for i, iteration in enumerate(split_list):
-            population_storage, tmpcurve = optimizer_list[i](iteration,
-            HyperParameters["num_individual"], self.obj_func).start(population_storage)
+            if global_elite is not None:
+                if population_storage is None:
+                    population_storage = np.tile(global_elite,(HyperParameters["num_individual"], 1))
+                else:
+                    population_storage = population_storage.copy()
+                    population_storage[0] = global_elite
+
+            population_storage, tmpcurve = optimizer_list[i](iteration,HyperParameters["num_individual"],self.obj_func).start(population_storage)
             curve = np.concatenate((curve, tmpcurve))
+
+            vals = [self.obj_func(ind) for ind in population_storage]
+            best_idx = int(np.argmin(vals))
+            best_val = vals[best_idx]
+            if best_val < global_elite_value:
+                global_elite_value = best_val
+                global_elite = population_storage[best_idx].copy()
+
         #print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
         if return_curve:
             return curve

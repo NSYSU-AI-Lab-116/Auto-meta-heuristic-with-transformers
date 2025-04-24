@@ -37,7 +37,7 @@ class PSO:
         convergence_curve = []
 
         for t in range(self.max_iter):
-            self.w = 0.9 - (t / self.max_iter) * 0.5  # 從 0.9 遞減到 0.4
+            self.w = 0.9 - (t / self.max_iter) * 0.5
             for i in range(self.num_par):
                 fitness = self.obj_function(self.particles[i])
                 
@@ -55,15 +55,15 @@ class PSO:
                 social_component = self.c2 * r2 * (self.gbest - self.particles[i])
                 self.velocities[i] = self.w * self.velocities[i] + cognitive_component + social_component
 
-                # 更新位置
                 self.particles[i] += self.velocities[i]
 
-                if self.f_type =="d":# 邊界處理
+                if self.f_type == "d":
                     self.particles[i][-1] = np.clip(self.particles[i][-1], 1, DataSet.NN_K)
                     self.particles[i][:-1] = np.clip(self.particles[i][:-1], DataSet.param_LB, DataSet.param_UB)
                 else:
                     self.particles[i] = np.clip(self.particles[i], self.lb, self.ub)
 
+            self.particles[-1] = self.gbest.copy()
             convergence_curve.append(self.gbest_score)
     
         return self.gbest, self.gbest_score, convergence_curve, self.particles
@@ -71,12 +71,12 @@ class PSO:
 
 class PSOCONTROL:
     __name__ = "PSO"
-    def __init__(self,MAX_ITER, NUM_PARTICLES,  FUNCTION):
+    def __init__(self, MAX_ITER, NUM_PARTICLES, FUNCTION):
         self.MAX_ITER = MAX_ITER
         self.NUM_PARTICLES = NUM_PARTICLES
         self.UB = FUNCTION.ub
         self.LB = FUNCTION.lb
-        self.DIM= FUNCTION.dim
+        self.DIM = FUNCTION.dim
         self.f = FUNCTION.func
         self.f_type = FUNCTION.f_type
 
@@ -89,43 +89,8 @@ class PSOCONTROL:
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-            """ with open("pso_curve.txt", "a") as f:
-                for i in range(len(curve)):
-                    f.write(f"{curve[i]}\n") """
             return (particles, curve)
 
 
-
-
 if __name__ == '__main__':
-    """ funcs_by_year = DataSet.funcs_years
-
-    # 設定參數
-    MAX_ITER = 500
-    NUM_PARTICLES = 30
-    DIM = 10
-
-    # CEC 函式呼叫方法  
-    for year in funcs_by_year['CEC']:
-        for func_name in funcs_by_year['CEC'][year]:
-            function = DataSet.get_function(year,func_name,DIM)  # 取得CEC Year年度，維度為 DIM 之 F1 函式的資訊
-            UB = function.ub
-            LB = function.lb
-            f = function.func # 取得函式
-            # 計算函式值 f([多個維度組成的陣列])   -> 例如 f([x,y])
-
-    
-            # 執行 PSO
-            pso = PSO(obj_function=f, dim=DIM, lb=LB, ub=UB, num_par=NUM_PARTICLES, max_iter=MAX_ITER)
-            best_position, best_value, curve = pso.optimize()
-
-            print(f"[CEC {year}-{func_name}] Best solution found:", best_position)
-            print(f"[CEC {year}-{func_name}] Best fitness:", best_value)
-
-            # 繪製收斂曲線
-            plt.plot(np.log10(curve))
-            plt.xlabel("Iterations")
-            plt.ylabel("Fitness Value (Log10)")
-            plt.title(f"PSO Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
- """
+    pass

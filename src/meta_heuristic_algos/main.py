@@ -47,8 +47,8 @@ class MAINCONTROL:
 
     def logging(self,msg):
         """ log the data"""
-        with open(os.path.join(self.folder_path, self.folder_name, "log.txt"), "a", encoding='utf-8') as f:
-            f.write(f'[{time_now()}]: {msg}\n')
+        #with open(os.path.join(self.folder_path, self.folder_name, "log.txt"), "a", encoding='utf-8') as f:
+            #f.write(f'[{time_now()}]: {msg}\n')
 
     def all_func(self):
         """ get all the functions from the dataset"""
