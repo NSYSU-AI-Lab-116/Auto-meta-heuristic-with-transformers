@@ -29,7 +29,6 @@ class GWO:
 
         self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
-        self.best_population = None
 
     def optimize(self):
         convergence_curve = []
@@ -41,7 +40,6 @@ class GWO:
                     self.delta_score, self.delta = self.beta_score, self.beta.copy()
                     self.beta_score, self.beta = self.alpha_score, self.alpha.copy()
                     self.alpha_score, self.alpha = fitness, self.wolves[i].copy()
-                    self.best_population= self.wolves.copy()
                     
                 elif fitness < self.beta_score:
                     self.delta_score, self.delta = self.beta_score, self.beta.copy()
@@ -80,7 +78,7 @@ class GWO:
                     self.wolves[i] = np.clip(self.wolves[i], self.lb, self.ub)
             convergence_curve.append(self.alpha_score)
         
-        return self.best_population, self.alpha, self.alpha_score, convergence_curve, self.wolves
+        return self.alpha, self.alpha_score, convergence_curve, self.wolves
     
 
 class GWOCONTROL:
@@ -98,12 +96,12 @@ class GWOCONTROL:
         gwo = GWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                   num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type,
                   init_population=init_population)
-        best_population, best_position, best_value, curve, wolves = gwo.optimize()
+        best_position, best_value, curve, wolves = gwo.optimize()
         
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (best_population, best_position, best_value, wolves, curve)
+            return (best_position, best_value, wolves, curve)
 
 
 if __name__ == '__main__':

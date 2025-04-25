@@ -36,7 +36,6 @@ class HHO:
 
         self.best_position = None
         self.best_score = np.inf
-        self.best_population = None
     
     def optimize(self):
         convergence_curve = []
@@ -49,9 +48,6 @@ class HHO:
                 if fitness < self.best_score:
                     self.best_score = fitness
                     self.best_position = self.hawks[i].copy()
-                    if not current_best:
-                        current_best = True
-                        self.best_population = self.hawks.copy()
             
             E0 = 2 * np.random.rand() - 1  # 初始逃脫能量
             for i in range(self.num_hawks):
@@ -106,12 +102,12 @@ class HHOCONTROL:
         hho = HHO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                   num_hawks=self.NUM_HAWKS, max_iter=self.MAX_ITER, f_type=self.f_type,
                   init_population=init_population)
-        best_population, best_position, best_value, curve, hawks = hho.optimize()
+        best_position, best_value, curve, hawks = hho.optimize()
         
         if self.f_type == "d":
             return (hawks, np.array(curve))
         else:
-            return (best_population, best_position, best_value, hawks, curve)
+            return (best_position, best_value, hawks, curve)
 
 if __name__ == '__main__':
     pass
