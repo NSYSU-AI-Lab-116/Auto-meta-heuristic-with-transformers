@@ -84,6 +84,7 @@ class GA:
                 self.gbest = self.population[gen_best_idx].copy()
                 self.best_population = self.population.copy()
 
+            self.population[-1] = self.gbest.copy()
             convergence_curve.append(self.gbest_score)
         return self.best_population, self.gbest, self.gbest_score, convergence_curve, self.population
 

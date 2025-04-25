@@ -1,12 +1,9 @@
 """ GWO (Grey Wolf Optimization) algorithm implementation """
 import numpy as np
 
-
 from src.meta_heuristic_algos.Config import Configs
 DataSet = Configs.DataSet
 
-
-# 定義 Grey Wolf Optimization (GWO)
 class GWO:
     def __init__(self, obj_function, dim, lb, ub, num_wolves, max_iter, f_type, init_population=None):
         self.obj_function = obj_function
@@ -27,14 +24,15 @@ class GWO:
         else:
             self.wolves = init_population
 
-        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim), np.random.uniform(self.lb, self.ub, self.dim)
+        self.alpha, self.beta, self.delta = np.random.uniform(self.lb, self.ub, self.dim), \
+                                            np.random.uniform(self.lb, self.ub, self.dim), \
+                                            np.random.uniform(self.lb, self.ub, self.dim)
         self.alpha_score, self.beta_score, self.delta_score = np.inf, np.inf, np.inf
         self.best_population = None
 
     def optimize(self):
         convergence_curve = []
         for t in range(self.max_iter):
-            # 計算適應度並更新 α, β, δ
             for i in range(self.num_wolves):
                 fitness = self.obj_function(self.wolves[i])
                 if fitness < self.alpha_score:
@@ -49,23 +47,18 @@ class GWO:
                 elif fitness < self.delta_score:
                     self.delta_score, self.delta = fitness, self.wolves[i].copy()
 
-            # 更新狼群位置
-            a = 2 - t * (2 / self.max_iter)  # 動態調整 a
+            a = 2 - t * (2 / self.max_iter)
             for i in range(self.num_wolves):
-
-                # calcu;ating X1
                 r1, r2 = np.random.rand(), np.random.rand()
                 A1, C1 = 2 * a * r1 - a, 2 * r2
                 D_alpha = abs(C1 * self.alpha - self.wolves[i])
                 X1 = self.alpha - A1 * D_alpha
 
-                # calculating X2
                 r1, r2 = np.random.rand(), np.random.rand()
                 A2, C2 = 2 * a * r1 - a, 2 * r2
                 D_beta = abs(C2 * self.beta - self.wolves[i])
                 X2 = self.beta - A2 * D_beta
 
-                # calculating X3
                 r1, r2 = np.random.rand(), np.random.rand()
                 A3, C3 = 2 * a * r1 - a, 2 * r2
                 D_delta = abs(C3 * self.delta - self.wolves[i])
@@ -73,15 +66,23 @@ class GWO:
 
                 self.wolves[i] = (X1 + X2 + X3) / 3
 
-                if self.f_type =='d':# 限制範圍
+                if self.f_type == 'd':
                     self.wolves[i][:-1] = np.clip(self.wolves[i][:-1], 1, DataSet.NN_K)
                     self.wolves[i][-1] = np.clip(self.wolves[i][-1], DataSet.param_LB, DataSet.param_UB)
                 else:
                     self.wolves[i] = np.clip(self.wolves[i], self.lb, self.ub)
+<<<<<<< HEAD
             convergence_curve.append(self.alpha_score)
         
         return self.best_population, self.alpha, self.alpha_score, convergence_curve, self.wolves
     
+=======
+
+            self.wolves[-1] = self.alpha.copy()
+            convergence_curve.append(self.alpha_score)
+
+        return self.alpha, self.alpha_score, convergence_curve, self.wolves
+>>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
 class GWOCONTROL:
     __name__ = "GWO"
@@ -104,7 +105,6 @@ class GWOCONTROL:
             return (wolves, np.array(curve))
         else:
             return (best_population, best_position, best_value, wolves, curve)
-
 
 if __name__ == '__main__':
     pass
