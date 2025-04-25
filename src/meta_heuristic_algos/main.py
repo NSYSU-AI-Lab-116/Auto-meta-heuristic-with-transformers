@@ -4,6 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 import os
 from datetime import datetime
 import argparse
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -44,6 +45,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime Error: {e}{Color.RESET}")
             self.logging(f"Runtime Error: {e}")
+            traceback.print_exc()
 
     def logging(self,msg):
         """ log the data"""
@@ -177,6 +179,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime rror: {e}{Color.RESET}")
             self.logging(f"Runtime error: {e}")
+            traceback.print_exc()
 
         try:
             for i, (curve, population) in enumerate(zip(all_curves, all_history_population)):
