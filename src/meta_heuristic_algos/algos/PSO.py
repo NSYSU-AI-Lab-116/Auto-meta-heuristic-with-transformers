@@ -32,18 +32,12 @@ class PSO:
         self.pbest_scores = np.array([np.inf] * self.num_par)
         self.gbest = np.random.uniform(self.lb, self.ub, self.dim)
         self.gbest_score = np.inf
-        self.best_population = None
     
     def optimize(self):
         convergence_curve = []
 
         for t in range(self.max_iter):
-<<<<<<< HEAD
-            self.w = 0.9 - (t / self.max_iter) * 0.5  # 從 0.9 遞減到 0.4
-            current_best = False 
-=======
             self.w = 0.9 - (t / self.max_iter) * 0.5
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
             for i in range(self.num_par):
                 fitness = self.obj_function(self.particles[i])
                 
@@ -54,9 +48,6 @@ class PSO:
                 if fitness < self.gbest_score:
                     self.gbest_score = fitness
                     self.gbest = self.particles[i].copy()
-                    if not current_best:
-                        current_best = True
-                        self.best_population = self.particles.copy()
         
             for i in range(self.num_par):
                 r1, r2 = np.random.rand(self.dim), np.random.rand(self.dim)
@@ -75,7 +66,7 @@ class PSO:
             self.particles[-1] = self.gbest.copy()
             convergence_curve.append(self.gbest_score)
     
-        return self.best_population, self.gbest, self.gbest_score, convergence_curve, self.particles
+        return self.gbest, self.gbest_score, convergence_curve, self.particles
 
 
 class PSOCONTROL:
@@ -93,19 +84,15 @@ class PSOCONTROL:
         pso = PSO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                   num_par=self.NUM_PARTICLES, max_iter=self.MAX_ITER, f_type=self.f_type,
                   init_population=init_population)
-        best_population, best_position, best_value, curve, particles = pso.optimize()
+        best_position, best_value, curve, particles = pso.optimize()
 
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-<<<<<<< HEAD
             """ with open("pso_curve.txt", "a") as f:
                 for i in range(len(curve)):
                     f.write(f"{curve[i]}\n") """
-            return (best_population, best_position, best_value, particles, curve)
-=======
             return (particles, curve)
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
 
 if __name__ == '__main__':

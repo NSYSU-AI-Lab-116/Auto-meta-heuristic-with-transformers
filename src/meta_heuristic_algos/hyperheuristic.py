@@ -77,21 +77,6 @@ class HyperEvaluationFunction:
         population_storage = None
         best_population = None
         curve = np.array([])
-<<<<<<< HEAD
-        best_value = np.inf
-
-        try:
-            for i, iteration in enumerate(split_list):
-                best_population, best_individual, best_value_temp, population_storage, tmpcurve = optimizer_list[i](iteration,
-                HyperParameters["num_individual"], self.obj_func).start(best_population)
-                curve = np.concatenate((curve, tmpcurve))
-                best_value = min(best_value, best_value_temp)
-        except Exception as e:
-            print(f"Error in optimizer {optimizer_names[i]} with parameters {param_list[i]}")
-            print(f"Error: {e}")
-            traceback.print_exc()
-            raise Exception(f"Error in optimizer {optimizer_names[i]} with parameters {param_list[i]}") from e
-=======
         global_elite = None
         global_elite_value = np.inf
 
@@ -113,8 +98,7 @@ class HyperEvaluationFunction:
                 global_elite_value = best_val
                 global_elite = population_storage[best_idx].copy()
 
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
         #print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
         if return_curve:
             return curve
-        return best_value
+        return global_elite_value

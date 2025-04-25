@@ -71,18 +71,11 @@ class GWO:
                     self.wolves[i][-1] = np.clip(self.wolves[i][-1], DataSet.param_LB, DataSet.param_UB)
                 else:
                     self.wolves[i] = np.clip(self.wolves[i], self.lb, self.ub)
-<<<<<<< HEAD
-            convergence_curve.append(self.alpha_score)
-        
-        return self.best_population, self.alpha, self.alpha_score, convergence_curve, self.wolves
-    
-=======
 
             self.wolves[-1] = self.alpha.copy()
             convergence_curve.append(self.alpha_score)
 
         return self.alpha, self.alpha_score, convergence_curve, self.wolves
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
 class GWOCONTROL:
     __name__ = "GWO"
@@ -99,12 +92,12 @@ class GWOCONTROL:
         gwo = GWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                   num_wolves=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type,
                   init_population=init_population)
-        best_population, best_position, best_value, curve, wolves = gwo.optimize()
+        best_position, best_value, curve, wolves = gwo.optimize()
         
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (best_population, best_position, best_value, wolves, curve)
+            return (wolves, curve)
 
 if __name__ == '__main__':
     pass

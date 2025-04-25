@@ -133,7 +133,7 @@ class EDGWOCONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (best_position, best_value, wolves, curve)
+            return (wolves, curve)
 
 
 if __name__ == '__main__':

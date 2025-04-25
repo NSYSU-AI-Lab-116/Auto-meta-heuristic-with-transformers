@@ -50,11 +50,6 @@ class DE:
 
         for iters in range(self.max_iter):
             start_time = time.time()
-<<<<<<< HEAD
-            current_best = False
-=======
-
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
             for i in range(self.num_par):
                 idxs = list(range(self.num_par))
                 idxs.remove(i)
@@ -83,24 +78,14 @@ class DE:
                     if trial_fitness < self.gbest_score:
                         self.gbest_score = trial_fitness
                         self.gbest = trial.copy()
-<<<<<<< HEAD
-                        if not current_best:
-                            self.best_population = self.population.copy()
-                            current_best = True
-=======
 
             self.population[-1] = self.gbest.copy()
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
             convergence_curve.append(self.gbest_score)
             if self.f_type == "hyperheuristic":
                 print(f"Iteration {iters+1}/{self.max_iter}, Best Fitness: {self.gbest_score}")
                 print(f"{Color.GREEN}time took: {time.time() - start_time:.2f} seconds{Color.RESET}")
-<<<<<<< HEAD
-        return self.best_population, self.gbest, self.gbest_score, convergence_curve, self.population
-=======
 
         return self.gbest, self.gbest_score, convergence_curve, self.population
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
 
 class DECONTROL:
@@ -127,12 +112,6 @@ class DECONTROL:
 
     def start(self, init_population=None):
         np.random.seed(os.getpid() + int(time.time()))
-<<<<<<< HEAD
-        de = DE(obj_function=self.f, dim=self.dim, lb=self.lb, ub=self.ub,
-                num_par=self.num_individual, max_iter=self.max_iter, f_type=self.f_type,
-                factor=self.factor, cross_rate=self.cross_rate, init_population=init_population)
-        best_population, best_position, best_value, curve, population = de.optimize()
-=======
         de = DE(
             obj_function=self.f,
             dim=self.dim,
@@ -146,12 +125,11 @@ class DECONTROL:
             init_population=init_population
         )
         best_position, best_value, curve, population = de.optimize()
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
         if self.f_type == "d":
             return (best_position, best_value, population, np.array(curve))
         else:
-            return (best_population, best_position, best_value, population, curve)
+            return (population, curve)
 
 
 if __name__ == '__main__':

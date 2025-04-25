@@ -95,7 +95,7 @@ class BESCONTROL:
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-            return (best_position, best_value, particles, curve)
+            return (particles, curve)
 
 
 

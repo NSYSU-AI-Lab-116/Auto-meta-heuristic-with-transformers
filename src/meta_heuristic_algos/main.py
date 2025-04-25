@@ -44,18 +44,13 @@ class MAINCONTROL:
                 self.year_func(Configs.exec_year)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime Error: {e}{Color.RESET}")
-<<<<<<< HEAD
-            traceback.print_exc()
-            self.logging(f"Runtime Error in init: {e}")
-=======
             self.logging(f"Runtime Error: {e}")
             traceback.print_exc()
->>>>>>> 96e327dbb0243a3c3188bcde26eea78bc58dfb94
 
     def logging(self,msg):
         """ log the data"""
-        #with open(os.path.join(self.folder_path, self.folder_name, "log.txt"), "a", encoding='utf-8') as f:
-            #f.write(f'[{time_now()}]: {msg}\n')
+        with open(os.path.join(self.folder_path, self.folder_name, "log.txt"), "a", encoding='utf-8') as f:
+            f.write(f'[{time_now()}]: {msg}\n')
 
     def all_func(self):
         """ get all the functions from the dataset"""
@@ -176,7 +171,7 @@ class MAINCONTROL:
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
-                    best_populstion, best_individual, best_score, population, curve = future.result()
+                    best_individual, best_score, population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
 
