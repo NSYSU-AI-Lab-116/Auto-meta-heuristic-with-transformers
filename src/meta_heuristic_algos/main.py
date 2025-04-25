@@ -171,7 +171,7 @@ class MAINCONTROL:
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
-                    best_individual, best_score, population, curve = future.result()
+                    population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
 
