@@ -188,12 +188,14 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Result extract error: {e}{Color.RESET}")
             self.logging(f"Result extract error: {e}")
+            traceback.print_exc()
 
         try:
             self.record_and_analize(np.array(all_curves), np.array(all_history_population))
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Record and analyze error: {e}{Color.RESET}")
             self.logging(f"Record error: {e}")
+            traceback.print_exc()
         self.logging(f"Finished!: DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
 
     def record_and_analize(self, all_curves, all_history_population):
@@ -213,21 +215,7 @@ class MAINCONTROL:
                 f.write(f"Round {i+1} | Best fitness: {all_curves[i][-1]}\n")
                 f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
-        try:
-            try:
-                self.plot_scale = "Log10"
-                tmp = np.log10(np.array(all_curves))
-                if np.isnan(all_curves).any():
-                    raise ValueError("Log10 of fitness values resulted in NaN")
-            except Exception as e:
-                print(f"{time_now()}: {Color.RED}Log10 error: {e}{Color.RESET}")
-                self.logging(f"Log10 error: {e}")
-                tmp = np.array(all_curves)
-                self.plot_scale = "Linear"
-            finally:
-                all_curves = np.nan_to_num(tmp)
-                
-            
+        try:    
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
 
             self.draw_curves(axes, all_curves)
@@ -237,6 +225,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Plotting error: {e}{Color.RESET}")
             self.logging(f"Plotting error: {e}")
+            traceback.print_exc()
 
         fig.suptitle(f"{self.f_type}-{self.year}-{self.name}-{self.dim}D-{self.iter}iter-{self.epochs}Round", fontsize=16)
         plt.tight_layout()
@@ -314,6 +303,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in function combination plot: {e}{Color.RESET}")
             self.logging(f"Error in function combination plot: {e}")
+            traceback.print_exc()
 
     def draw_best_solution(self, axes, all_curves):
         ax = axes[1, 0]
@@ -360,6 +350,7 @@ class MAINCONTROL:
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in convergence speed plot: {e}{Color.RESET}")
             self.logging(f"Error in convergence speed plot: {e}")
+            traceback.print_exc()
 
     def draw_hypr_meta_compare(self, axes, all_curves, all_history_population):
         """ draw the population difference"""
@@ -396,12 +387,12 @@ class MAINCONTROL:
                     ).start))for trial in range(30)]
                     single_curves = None
                     for future in futures:
-                        pop , curve = future.result()
+                        best_pop, best_individual, best_value, pop , curve = future.result()
                         if single_curves is None:
                             single_curves = curve
                         else:
                             single_curves = np.vstack((single_curves,curve))
-                    ax.plot(np.average(single_curves,axis=0),
+                    ax.plot(np.log10(np.average(single_curves,axis=0)),
                             label=f"{optname}", 
                             color=plt.get_cmap('inferno')(idx/10), linestyle='--', marker='o', markersize=1, linewidth=0.5)
 
@@ -410,12 +401,13 @@ class MAINCONTROL:
             
 
             ax.set_xlabel('Times of evaluation')
-            ax.set_ylabel(f'Fitness {self.plot_scale}')
+            ax.set_ylabel(f'Fitness')
             ax.set_title('Compare of metaheuristic algorithms')
             ax.legend(title="Heuristics", bbox_to_anchor=(1.05, 1), loc='upper left') 
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in metaheuristic comparison: {e}{Color.RESET}")
             self.logging(f"Error in metaheuristic comparison: {e}")
+            traceback.print_exc()
             
        
         
