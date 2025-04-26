@@ -1,7 +1,0 @@
-Function Type: CEC
-Year: 2022
-Name: F5
-Dimension: 10
-Iterations: 500
-Epochs: 10
-num_individual: 20
