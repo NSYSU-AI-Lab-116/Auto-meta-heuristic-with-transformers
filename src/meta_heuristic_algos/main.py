@@ -34,7 +34,7 @@ class MAINCONTROL:
         self.epochs = HyperParameters.Parameters["epoch"]
         self.iter = HyperParameters.Parameters["hyper_iter"]
         self.obj_func = None    
-        self.plot_scale = "Linear"
+        self.plot_scale = "Value"
         try:
             if Configs.execution_type == "single":
                 self.get_args()
@@ -214,20 +214,9 @@ class MAINCONTROL:
                 f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
         try:
-            try:
-                self.plot_scale = "Log10"
-                tmp = np.log10(np.array(all_curves))
-                if np.isnan(all_curves).any():
-                    raise ValueError("Log10 of fitness values resulted in NaN")
-            except Exception as e:
-                print(f"{time_now()}: {Color.RED}Log10 error: {e}{Color.RESET}")
-                self.logging(f"Log10 error: {e}")
-                tmp = np.array(all_curves)
-                self.plot_scale = "Linear"
-            finally:
-                all_curves = np.nan_to_num(tmp)
-                
-            
+            self.plot_scale = "Value"
+            all_curves = np.array(all_curves)
+
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
 
             self.draw_curves(axes, all_curves)
@@ -418,7 +407,6 @@ class MAINCONTROL:
             self.logging(f"Error in metaheuristic comparison: {e}")
             
        
-        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Metaheuristic Algorithm Runner")
