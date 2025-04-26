@@ -406,7 +406,7 @@ class MAINCONTROL:
                             single_curves = curve
                         else:
                             single_curves = np.vstack((single_curves,curve))
-                    ax.plot(np.log10(np.average(single_curves,axis=0)),
+                    ax.plot(np.average(single_curves,axis=0),
                             label=f"{optname}", 
                             color=plt.get_cmap('inferno')(idx/10), linestyle='--', marker='o', markersize=1, linewidth=0.5)
 
