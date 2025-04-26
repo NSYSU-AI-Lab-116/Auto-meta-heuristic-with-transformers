@@ -16,7 +16,7 @@ from src.meta_heuristic_algos.Config import Configs
 from src.meta_heuristic_algos.Optimizer import HyperParameters, Optimizers
 from src.meta_heuristic_algos.hyperheuristic import HyperHeuristicTemplate, HyperEvaluationFunction
 
-mpl.rcParams['figure.dpi'] = 1200 # 設定全域 PPI 為 300
+#mpl.rcParams['figure.dpi'] = 1200 # 設定全域 PPI 為 300
 Color = Configs.Color
 DataSet = Configs.DataSet
 
@@ -218,9 +218,7 @@ class MAINCONTROL:
         try:
             self.plot_scale = "Value"
             all_curves = np.array(all_curves)
-
-            fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
-
+            axes = plt
             self.draw_curves(axes, all_curves)
             self.draw_combination(axes, all_curves, all_history_population)
             self.draw_best_solution(axes, all_curves)
@@ -230,16 +228,9 @@ class MAINCONTROL:
             self.logging(f"Plotting error: {e}")
             traceback.print_exc()
 
-        fig.suptitle(f"{self.f_type}-{self.year}-{self.name}-{self.dim}D-{self.iter}iter-{self.epochs}Round", fontsize=16)
-        plt.tight_layout()
-        fig_save_path = os.path.join(self.folder_path, self.folder_name, "figure.png")
-        plt.savefig(fig_save_path)
-        print(f"{Color.GREEN}Figure saved to {fig_save_path}{Color.RESET}")
-        self.logging(f"Figure saved to {fig_save_path}")
-
     def draw_curves(self, axes, all_curves):
         """ draw the curves"""
-        ax = axes[0, 0]
+        fig, ax = plt.subplots(1,1, figsize=(12, 8))
         for i, curve in enumerate(all_curves):
             ax.plot(list(range(1,len(curve)+1)),curve, label=f"Round {i+1}", color=plt.get_cmap('inferno')(i/10), linestyle='--')
         ax.set_title("Fitnesses with different Rounds")
@@ -248,11 +239,17 @@ class MAINCONTROL:
         ax.grid(True)
         ax.legend(title="Round", bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))
+        
+        plt.tight_layout()
+        fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_1.svg')
+        plt.savefig(fig_save_path)
+        print(f"{Color.GREEN} Curves figure saved to {fig_save_path}{Color.RESET}")
+        self.logging(f"Figure saved to {fig_save_path}")
 
     def draw_combination(self, axes, all_curves, all_history_population):
         """ draw the functoion combination of the best solution"""
         try:
-            ax = axes[0, 1]
+            fig, ax = plt.subplots(1,1, figsize=(12, 8))
             best_population = all_history_population[:,-1]
             population_dataframe = pd.DataFrame(
                 {
@@ -296,20 +293,28 @@ class MAINCONTROL:
 
             ax.set_xticks(x)
             ax.set_xticklabels(groups)
-            ax.set_xlabel('Round')
-            ax.set_ylabel('Time')
+            ax.set_xlabel('Round') 
+            ax.set_ylabel('Times of evaluation')
             ax.set_title('Function activation time for each Round')
 
-            handles, labels = axes[0, 1].get_legend_handles_labels()
+            handles, labels = ax.get_legend_handles_labels()
             by_label = dict(zip(labels, handles))
             ax.legend(by_label.values(), by_label.keys(), title='Function', bbox_to_anchor=(1.05, 1), loc='upper left')
+            
+            plt.tight_layout()
+            fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_2.svg')
+            plt.savefig(fig_save_path)
+            
+            print(f"{Color.GREEN} Combinations figure saved to {fig_save_path}{Color.RESET}")
+            self.logging(f"Figure saved to {fig_save_path}")
+
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in function combination plot: {e}{Color.RESET}")
             self.logging(f"Error in function combination plot: {e}")
             traceback.print_exc()
 
     def draw_best_solution(self, axes, all_curves):
-        ax = axes[1, 0]
+        fig, ax = plt.subplots(1,1, figsize=(12, 8))
         """ draw the best solution"""
         try:
             min_value = np.min(all_curves, axis=1)
@@ -349,6 +354,12 @@ class MAINCONTROL:
             charts = [line1, bar1]
             labels = [chart.get_label() for chart in charts]
             ax.legend(charts, labels, bbox_to_anchor=(1.05, 1), loc='upper left', title="Insight")
+            
+            plt.tight_layout()
+            fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_3.svg')
+            plt.savefig(fig_save_path)
+            print(f"{Color.GREEN} Fitness figure saved to {fig_save_path}{Color.RESET}")
+            self.logging(f"Figure saved to {fig_save_path}")
 
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in convergence speed plot: {e}{Color.RESET}")
@@ -359,7 +370,7 @@ class MAINCONTROL:
         """ draw the population difference"""
         
         try:
-            ax = axes[1, 1]
+            fig, ax = plt.subplots(1,1, figsize=(12, 8))
             best_population = all_history_population[np.argmin(all_curves[:,-1]),-1]
 
             meta_curves = None
@@ -390,7 +401,7 @@ class MAINCONTROL:
                     ).start))for trial in range(30)]
                     single_curves = None
                     for future in futures:
-                        best_pop, best_individual, best_value, pop , curve = future.result()
+                        pop , curve = future.result()
                         if single_curves is None:
                             single_curves = curve
                         else:
@@ -404,9 +415,15 @@ class MAINCONTROL:
             
 
             ax.set_xlabel('Times of evaluation')
-            ax.set_ylabel(f'Fitness')
+            ax.set_ylabel(f'Fitness {self.plot_scale}')
             ax.set_title('Compare of metaheuristic algorithms')
             ax.legend(title="Heuristics", bbox_to_anchor=(1.05, 1), loc='upper left') 
+            
+            plt.tight_layout()
+            fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_4.svg')
+            plt.savefig(fig_save_path)
+            print(f"{Color.GREEN} meta figure saved to {fig_save_path}{Color.RESET}")
+            self.logging(f"Figure saved to {fig_save_path}")
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Error in metaheuristic comparison: {e}{Color.RESET}")
             self.logging(f"Error in metaheuristic comparison: {e}")
