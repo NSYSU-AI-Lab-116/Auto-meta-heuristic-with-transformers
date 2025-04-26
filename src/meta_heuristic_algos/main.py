@@ -149,7 +149,7 @@ class MAINCONTROL:
         self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
         print(f"{Color.MAGENTA}DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}{Color.RESET}\n")
         print(f"{Color.MAGENTA}Iter: {self.iter} -  Epoch: {self.epochs}{Color.RESET}\n")
-        os.system(f'mkdir {os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/all_runner/{self.folder_name}')
+        os.mkdir(os.path.join(self.folder_path, self.folder_name))
         self.logging(f"Running DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
         
         try:
