@@ -84,6 +84,7 @@ class CHGWOSCA:
                     X_new = np.clip(X_new, self.lb, self.ub)
                 self.wolves[i] = X_new
 
+            self.wolves[-1] = self.alpha.copy()
             convergence_curve.append(self.alpha_score)
 
         return self.alpha, self.alpha_score, convergence_curve, self.wolves
@@ -112,7 +113,7 @@ class CHGWOSCACONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (best_position, best_value, wolves, curve)
+            return (wolves, curve)
 
 
 
@@ -148,5 +149,4 @@ if __name__ == '__main__':
             plt.xlabel("Iterations")
             plt.ylabel("Fitness Value (Log10)")
             plt.title(f"CH-GWOSCA Convergence {year}-{func_name}-{DIM}D")
-            plt.show()
- """
+            plt.show() """

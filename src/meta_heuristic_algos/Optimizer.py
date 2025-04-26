@@ -20,14 +20,14 @@ class Optimizers:
     metaheuristic_list = {
         #"EDGWO": EDGWOCONTROL,
         "GWO": GWOCONTROL,
-        #"CHGWOSCA": CHGWOSCACONTROL,
+        "CHGWOSCA": CHGWOSCACONTROL,
         #"REEGWO": REEGWOCONTROL,
         #"MSGWO": MSGWOCONTROL,
-        #"BES": BESCONTROL,
-        #"ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
+        "BES": BESCONTROL,
+        "ChOA": ChOACONTROL,  # issue: UnboundLocalError: cannot access local variable 'sorted_indices' where it is not associated with a value
         "PSO" :PSOCONTROL,
         "HHO" :HHOCONTROL,
-        #"SCSO":SCSOCONTROL,
+        "SCSO":SCSOCONTROL,
         #"REINEDGWO": REINEDGWOCONTROL,
         "DE": DECONTROL,
         "GA": GACONTROL,

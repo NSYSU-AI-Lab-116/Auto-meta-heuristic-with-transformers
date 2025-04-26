@@ -34,7 +34,7 @@ class MAINCONTROL:
         self.epochs = HyperParameters.Parameters["epoch"]
         self.iter = HyperParameters.Parameters["hyper_iter"]
         self.obj_func = None    
-        self.plot_scale = "Linear"
+        self.plot_scale = "Value"
         try:
             if Configs.execution_type == "single":
                 self.get_args()
@@ -44,8 +44,8 @@ class MAINCONTROL:
                 self.year_func(Configs.exec_year)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Runtime Error: {e}{Color.RESET}")
+            self.logging(f"Runtime Error: {e}")
             traceback.print_exc()
-            self.logging(f"Runtime Error in init: {e}")
 
     def logging(self,msg):
         """ log the data"""
@@ -171,7 +171,7 @@ class MAINCONTROL:
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
-                    best_populstion, best_individual, best_score, population, curve = future.result()
+                    population, curve = future.result()
                     all_curves.append(curve)
                     all_history_population.append(population)
 
@@ -215,7 +215,10 @@ class MAINCONTROL:
                 f.write(f"Round {i+1} | Best fitness: {all_curves[i][-1]}\n")
                 f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
 
-        try:    
+        try:
+            self.plot_scale = "Value"
+            all_curves = np.array(all_curves)
+
             fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16,12))
 
             self.draw_curves(axes, all_curves)
@@ -410,7 +413,6 @@ class MAINCONTROL:
             traceback.print_exc()
             
        
-        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Metaheuristic Algorithm Runner")

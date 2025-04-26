@@ -45,12 +45,10 @@ class BES:
 
                 self.energy[i] = fitness 
 
-                # 最佳位置
                 if self.energy[i] < self.best_energy[i]:
                     self.best_energy[i] = self.energy[i]
                     self.best_position[i] = self.particles[i].copy()
 
-                # 全局最佳
                 if self.energy[i] < self.gbest_energy:
                     self.gbest_energy = self.energy[i]
                     self.gbest_position = self.particles[i].copy()
@@ -59,19 +57,16 @@ class BES:
                 r1 = np.random.rand(self.dim)
                 r2 = np.random.rand(self.dim)
 
-                # 更新速度
                 velocity = self.w * self.particles[i] + self.c1 * r1 * (self.best_position[i] - self.particles[i]) + self.c2 * r2 * (self.gbest_position - self.particles[i])
-
-                # 更新位置
                 self.particles[i] = self.particles[i] + velocity
 
-                # 邊界處理
                 if self.f_type == "d":
                     self.particles[i][-1] = np.clip(self.particles[i][-1], 1, DataSet.NN_K)
                     self.particles[i][:-1] = np.clip(self.particles[i][:-1], DataSet.param_LB, DataSet.param_UB)
                 else:
                     self.particles[i] = np.clip(self.particles[i], self.lb, self.ub)
 
+            self.particles[-1] = self.gbest_position.copy()
             convergence_curve.append(self.gbest_energy)
 
         return self.gbest_position, self.gbest_energy, convergence_curve, self.particles
@@ -100,7 +95,7 @@ class BESCONTROL:
         if self.f_type == "d":
             return (particles, np.array(curve))
         else:
-            return (best_position, best_value, particles, curve)
+            return (particles, curve)
 
 
 
