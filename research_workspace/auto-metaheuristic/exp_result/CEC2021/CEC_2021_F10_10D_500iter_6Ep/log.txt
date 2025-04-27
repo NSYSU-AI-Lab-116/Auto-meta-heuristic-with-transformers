@@ -1,0 +1,19 @@
+[2025-04-27 20:55:37]: Running DataSet: CEC-2021-F10 - Dimension: 10
+[2025-04-28 01:01:51]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F10_10D_500iter_6Ep/CEC_2021_F10_1.svg
+[2025-04-28 01:01:51]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F10_10D_500iter_6Ep/CEC_2021_F10_2.svg
+[2025-04-28 01:01:52]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F10_10D_500iter_6Ep/CEC_2021_F10_3.svg
+[2025-04-28 01:01:58]: Metaheuristic comparison: [[4207.68506627 4207.68506627 3393.63330322 ... 3087.70693133
+  3087.69941121 3087.69941121]
+ [4207.68506627 4207.68506627 3393.63330322 ... 3084.58231273
+  3084.58231273 3084.58231273]
+ [4207.68506627 4207.68506627 3393.63330322 ... 3084.31370511
+  3084.31370511 3084.31370511]
+ ...
+ [3945.09555003 3945.09555003 3945.09555003 ... 3008.73571979
+  3008.73571979 3008.73571979]
+ [4055.37858457 3808.90549287 3744.50300033 ... 3007.99231231
+  3007.99231231 3007.99231231]
+ [5025.34445267 4523.37390206 3429.30854827 ... 2984.12685704
+  2984.12685704 2984.12685704]]
+[2025-04-28 01:03:00]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F10_10D_500iter_6Ep/CEC_2021_F10_4.svg
+[2025-04-28 01:03:00]: Finished!: DataSet: CEC-2021-F10 - Dimension: 10
