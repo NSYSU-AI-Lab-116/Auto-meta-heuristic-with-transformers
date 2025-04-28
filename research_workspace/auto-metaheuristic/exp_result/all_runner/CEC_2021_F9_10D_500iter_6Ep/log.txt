@@ -1,0 +1,4 @@
+[2025-04-27 23:39:34]: Running DataSet: CEC-2021-F9 - Dimension: 10
+[2025-04-28 04:07:11]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_500iter_6Ep/CEC_2021_F9_1.svg
+[2025-04-28 04:07:12]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_500iter_6Ep/CEC_2021_F9_2.svg
+[2025-04-28 04:07:12]: Figure saved to /home/alvin/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_500iter_6Ep/CEC_2021_F9_3.svg
