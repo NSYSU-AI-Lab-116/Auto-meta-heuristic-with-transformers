@@ -51,6 +51,14 @@ class MAINCONTROL:
         """ log the data"""
         with open(os.path.join(self.folder_path, self.folder_name, "log.txt"), "a", encoding='utf-8') as f:
             f.write(f'[{time_now()}]: {msg}\n')
+            
+    def save_output(self, name, data, folder="data"):
+        """ save the output"""
+        if not os.path.exists(os.path.join(self.folder_path, self.folder_name, folder)):
+            os.mkdir(os.path.join(self.folder_path, self.folder_name, folder))
+        path = os.path.join(self.folder_path, self.folder_name, folder, name)
+        np.save(path, data)
+        self.logging(f"Output saved to {path}")
 
     def all_func(self):
         """ get all the functions from the dataset"""
@@ -189,9 +197,14 @@ class MAINCONTROL:
             print(f"{time_now()}: {Color.RED}Result extract error: {e}{Color.RESET}")
             self.logging(f"Result extract error: {e}")
             traceback.print_exc()
-
+            
+        all_curves = np.array(all_curves)
+        all_history_population = np.array(all_history_population)
+        self.save_output("all_curves.npy", all_curves)
+        self.save_output("all_history_population.npy", all_history_population)
+        
         try:
-            self.record_and_analize(np.array(all_curves), np.array(all_history_population))
+            self.record_and_analize(all_curves, all_history_population)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Record and analyze error: {e}{Color.RESET}")
             self.logging(f"Record error: {e}")
@@ -261,6 +274,8 @@ class MAINCONTROL:
                         list(Optimizers.metaheuristic_list.keys())).flatten(),len(all_curves)),
                 }
             )
+            
+            
 
             groups = population_dataframe['Epoch'].unique()
             unique_categories = population_dataframe['Param_name'].unique()
@@ -328,6 +343,9 @@ class MAINCONTROL:
                         break
 
             x = list(range(1,len(all_curves)+1))
+            
+            self.save_output("first_reached.npy", first_reached)
+            self.save_output("best_fitness.npy", min_value)
 
             #draw the convergence speed
             color1 = plt.get_cmap('inferno')(10)
@@ -373,7 +391,7 @@ class MAINCONTROL:
             fig, ax = plt.subplots(1,1, figsize=(12, 8))
             best_population = all_history_population[np.argmin(all_curves[:,-1]),-1]
 
-            meta_curves = None
+            hyper_curve = None
             with ProcessPoolExecutor() as executor:
                 futures = [executor.submit(
                     HyperEvaluationFunction(
@@ -382,15 +400,15 @@ class MAINCONTROL:
 
                 for future in futures:
                     curve = future.result()
-                    if meta_curves is None:
-                        meta_curves = curve
+                    if hyper_curve is None:
+                        hyper_curve = curve
                     else:
-                        meta_curves = np.vstack((meta_curves,curve))
-            self.logging(f"Metaheuristic comparison: {meta_curves}")
+                        hyper_curve = np.vstack((hyper_curve,curve))
+            self.logging(f"Metaheuristic comparison: {hyper_curve}")
 
-            hyper_curve = np.average(meta_curves,axis=0)
+            hyper_curve = np.average(hyper_curve,axis=0)
+            meta_curve = None
             with ProcessPoolExecutor() as executor:
-                meta_curves = None
                 
                 for idx, (optname, opt) in enumerate(Optimizers.metaheuristic_list.items()):
                     futures = [(executor.submit(
@@ -406,14 +424,23 @@ class MAINCONTROL:
                             single_curves = curve
                         else:
                             single_curves = np.vstack((single_curves,curve))
-                    ax.plot(np.average(single_curves,axis=0),
+
+                    single_avg = np.average(single_curves,axis=0)
+                    if meta_curve is None:
+                        meta_curve = single_avg
+                    else:
+                        print(f'{optname} finish')
+                        meta_curve = np.vstack((meta_curve, single_avg))
+                    ax.plot(single_avg,
                             label=f"{optname}", 
                             color=plt.get_cmap('inferno')(idx/10), linestyle='--', marker='o', markersize=1, linewidth=0.5)
 
-                ax.plot(hyper_curve, label="HYPER",
-                        color='red', zorder=10, linestyle='--', marker='x', markersize=3, linewidth=0.5)
-            
+            ax.plot(hyper_curve, label="HYPER",
+                    color='red', zorder=10, linestyle='--', marker='x', markersize=3, linewidth=0.5)
 
+            self.save_output("hyper_curve.npy", hyper_curve)
+            self.save_output("meta_curve.npy", meta_curve)
+            
             ax.set_xlabel('Times of evaluation')
             ax.set_ylabel(f'Fitness {self.plot_scale}')
             ax.set_title('Compare of metaheuristic algorithms')
