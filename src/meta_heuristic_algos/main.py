@@ -429,7 +429,6 @@ class MAINCONTROL:
                     if meta_curve is None:
                         meta_curve = single_avg
                     else:
-                        print(f'{optname} finish')
                         meta_curve = np.vstack((meta_curve, single_avg))
                     ax.plot(single_avg,
                             label=f"{optname}", 
