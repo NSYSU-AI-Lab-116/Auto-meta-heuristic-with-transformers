@@ -54,7 +54,6 @@ class GA:
 
     def optimize(self):
         convergence_curve = []
-        convergence_curve.append(self.gbest_score) # first generation
 
         for i in range(self.max_iter):
             new_population = []
