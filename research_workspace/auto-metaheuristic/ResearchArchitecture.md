@@ -7,7 +7,6 @@
 - python
 - matplotlib
 - opfunu
-- tqdm
 
 ## Implementation method
 
