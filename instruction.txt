@@ -5,6 +5,7 @@ mkdir -p src/cpp/build
 cd build
 cmake ..                      
 make -j         
+cd ..
 
-Test in tests folder...
-
+# Test in tests folder...
+python tests/algo_test.py
