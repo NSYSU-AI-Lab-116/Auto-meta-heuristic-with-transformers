@@ -4,7 +4,7 @@ After adding new algos and finising it(algo.run()), do that:
 rm -rf src/cpp/build
 mkdir -p src/cpp/build
 cd build
-cmake .. # 如果在cache裡面已經存在其他CMakeCache.txt 會無法make 需要先將其刪掉(把其他在電腦中專案路徑的build刪除)或是直接在前一個build/ make       
+cmake .. # 如果在cache裡面已經有其它CMakeCache.txt 會無法make 需要先將其刪掉(把其他在電腦中專案root路徑的build刪掉)
 make -j         
 cd ..
 
