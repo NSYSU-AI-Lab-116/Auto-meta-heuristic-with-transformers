@@ -1,0 +1,10 @@
+After adding new algos and finising it(algo.run()), do that:
+# rebuild
+rm -rf src/cpp/build
+mkdir -p src/cpp/build
+cd build
+cmake ..                      
+make -j         
+
+Test in tests folder...
+
