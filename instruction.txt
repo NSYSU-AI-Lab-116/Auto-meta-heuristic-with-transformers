@@ -1,6 +1,6 @@
 git submodule update --init extern/pybind11
 After adding new algos and finising it(algo.run()), do that:
-# rebuild
+# rebuild (In Project root directory)
 rm -rf src/cpp/build
 mkdir -p src/cpp/build
 cd build
