@@ -6,6 +6,13 @@ old_data/
 .vscode/
 *test*
 
+
+# Cmake 
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
