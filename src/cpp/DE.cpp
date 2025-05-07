@@ -9,16 +9,35 @@
 //using namespace std; // error (maybe)
 namespace py = pybind11;
 using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-py::tuple run(py::array_t<double> pop_in, py::function obj_func, double F, double Cr, int max_iter)
+py::tuple run(py::function obj_func, int max_iter, int dim, int num_par, py::array_t<double> pop_in, double F, double Cr)
 {
-    // numpy -> Eigen
-    auto buf = pop_in.unchecked<2>();
-    int num_par = buf.shape(0), dim = buf.shape(1);
-    Matrix population(num_par, dim);
-    for(int i = 0; i < num_par; i++)
-    {
-        for(int j = 0; j < dim; j++)
-            population(i,j) = buf(i,j);
+    Matrix population;
+
+    // check and fill in with random when empty
+    if (pop_in.size() == 0) {
+        population.resize(num_par, dim);
+
+        std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        std::uniform_real_distribution<double> uni(-1.0, 1.0); // Example range
+
+        for (int i = 0; i < num_par; ++i) {
+            for (int j = 0; j < dim; ++j) {
+                population(i, j) = uni(rng);
+            }
+        }
+
+    } else {
+        // check shape
+        auto buf = pop_in.unchecked<2>();
+        num_par = buf.shape(0);
+        dim = buf.shape(1);
+        population.resize(num_par, dim);
+
+        for (int i = 0; i < num_par; ++i) {
+            for (int j = 0; j < dim; ++j) {
+                population(i, j) = buf(i, j);
+            }
+        }
     }
     
     // random engine
@@ -108,9 +127,12 @@ PYBIND11_MODULE(DE_cpp, m)
 {
     m.doc() = "Differential Evolution core accelerated with C++";
     m.def("run", &run,
-          py::arg("pop_in"),
-          py::arg("obj_func"),
-          py::arg("F"),
-          py::arg("Cr"),
-          py::arg("max_iter"));
+        py::arg("obj_func"),
+        py::arg("max_iter"),
+        py::arg("dim"),
+        py::arg("num_par"),
+        py::arg("pop_in") = py::array_t<double>(),
+        py::arg("F") = 0.5,
+        py::arg("Cr") = 0.9
+        );
 }
