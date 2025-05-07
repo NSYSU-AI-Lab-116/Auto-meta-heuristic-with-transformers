@@ -5,15 +5,40 @@
 #include <limits>
 #include <vector>
 #include <chrono>
-#include <iostream>
 
 //using namespace std; // error (maybe)
 namespace py = pybind11;
 using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double lb, double ub, py::array_t<double> pop_in, double F, double Cr)
+py::tuple run(py::function obj_func, int max_iter, int dim, int num_par, py::array_t<double> pop_in, double F, double Cr)
 {
-    Matrix population(num_par, dim);
-    population = Eigen::Map<Matrix>(reinterpret_cast<double*>(pop_in.mutable_data()), num_par, dim);
+    Matrix population;
+
+    // check and fill in with random when empty
+    if (pop_in.size() == 0) {
+        population.resize(num_par, dim);
+
+        std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        std::uniform_real_distribution<double> uni(-1.0, 1.0); // Example range
+
+        for (int i = 0; i < num_par; ++i) {
+            for (int j = 0; j < dim; ++j) {
+                population(i, j) = uni(rng);
+            }
+        }
+
+    } else {
+        // check shape
+        auto buf = pop_in.unchecked<2>();
+        num_par = buf.shape(0);
+        dim = buf.shape(1);
+        population.resize(num_par, dim);
+
+        for (int i = 0; i < num_par; ++i) {
+            for (int j = 0; j < dim; ++j) {
+                population(i, j) = buf(i, j);
+            }
+        }
+    }
     
     // random engine
     std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
@@ -42,9 +67,6 @@ py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double 
     curve.reserve(max_iter);
     for(int iter = 0; iter < max_iter; ++iter) 
     {
-        if (dim !=10){
-            std::cout << "iter: " << iter << std::endl;
-        }
         for(int i = 0; i < num_par; ++i) 
         {
             std::vector<int> idxs;
@@ -74,7 +96,7 @@ py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double 
             }
 
             // clip (not sure whether necessary)
-            trial = trial.cwiseMax(lb).cwiseMin(ub);
+            //trial = trial.cwiseMax(lb).cwiseMin(ub);
 
             // eval
             py::array_t<double> trial_arr({dim}, trial.data());
@@ -105,13 +127,11 @@ PYBIND11_MODULE(DE_cpp, m)
 {
     m.doc() = "Differential Evolution core accelerated with C++";
     m.def("run", &run,
+        py::arg("obj_func"),
         py::arg("max_iter"),
         py::arg("dim"),
-        py::arg("obj_func"),
         py::arg("num_par"),
-        py::arg("lb"),
-        py::arg("ub"),
-        py::arg("pop_in"),
+        py::arg("pop_in") = py::array_t<double>(),
         py::arg("F") = 0.5,
         py::arg("Cr") = 0.9
         );
