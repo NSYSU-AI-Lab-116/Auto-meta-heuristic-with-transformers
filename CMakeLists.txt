@@ -61,8 +61,7 @@ foreach(SRC ${ALG_SRCS})
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
-
-
+    
     install(TARGETS ${ALG}_cpp
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
@@ -71,22 +70,3 @@ foreach(SRC ${ALG_SRCS})
     # Add the target name to the list
     list(APPEND ALL_TARGETS ${ALG}_cpp)
 endforeach()
-
-# Custom target to clean the library output directory
-add_custom_target(clean_library_output
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Cleaning the library output directory"
-)
-
-# Create a custom target that depends on all the library targets
-add_custom_target(all_targets
-    DEPENDS ${ALL_TARGETS}
-)
-
-# Ensure that 'clean_library_output' is executed before 'all_targets'
-add_dependencies(all_targets clean_library_output)
-
-# Make 'all_targets' the default target
-set_property(GLOBAL PROPERTY DEFAULT_TARGET all_targets)
