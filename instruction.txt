@@ -1,12 +1,9 @@
 git submodule update --init extern/pybind11
+
 After adding new algos and finising it(algo.run()), do that:
 # rebuild (In Project root directory)
-rm -rf src/cpp/build
-mkdir -p src/cpp/build
-cd build
-cmake .. # 如果在cache裡面已經有其它CMakeCache.txt 會無法make 需要先將其刪掉(把其他在電腦中專案root路徑的build刪掉)
-make -j         
-cd ..
 
-# Test in tests folder...
-python tests/algo_test.py
+simply run the code in root of this project
+
+$ cmake .
+$ make -j
