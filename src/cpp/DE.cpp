@@ -5,21 +5,15 @@
 #include <limits>
 #include <vector>
 #include <chrono>
+#include <iostream>
 
 //using namespace std; // error (maybe)
 namespace py = pybind11;
 using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-py::tuple run(py::array_t<double> pop_in, py::function obj_func, double F, double Cr, int max_iter)
+py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double lb, double ub, py::array_t<double> pop_in, double F, double Cr)
 {
-    // numpy -> Eigen
-    auto buf = pop_in.unchecked<2>();
-    int num_par = buf.shape(0), dim = buf.shape(1);
     Matrix population(num_par, dim);
-    for(int i = 0; i < num_par; i++)
-    {
-        for(int j = 0; j < dim; j++)
-            population(i,j) = buf(i,j);
-    }
+    population = Eigen::Map<Matrix>(reinterpret_cast<double*>(pop_in.mutable_data()), num_par, dim);
     
     // random engine
     std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
@@ -48,6 +42,9 @@ py::tuple run(py::array_t<double> pop_in, py::function obj_func, double F, doubl
     curve.reserve(max_iter);
     for(int iter = 0; iter < max_iter; ++iter) 
     {
+        if (dim !=10){
+            std::cout << "iter: " << iter << std::endl;
+        }
         for(int i = 0; i < num_par; ++i) 
         {
             std::vector<int> idxs;
@@ -77,7 +74,7 @@ py::tuple run(py::array_t<double> pop_in, py::function obj_func, double F, doubl
             }
 
             // clip (not sure whether necessary)
-            //trial = trial.cwiseMax(lb).cwiseMin(ub);
+            trial = trial.cwiseMax(lb).cwiseMin(ub);
 
             // eval
             py::array_t<double> trial_arr({dim}, trial.data());
@@ -97,6 +94,7 @@ py::tuple run(py::array_t<double> pop_in, py::function obj_func, double F, doubl
                 }
             }
         }
+        population.row(num_par - 1) = Eigen::Map<const Eigen::RowVectorXd>(gbest.data(), dim);
         curve.push_back(gbest_score);
     }
 
@@ -108,9 +106,14 @@ PYBIND11_MODULE(DE_cpp, m)
 {
     m.doc() = "Differential Evolution core accelerated with C++";
     m.def("run", &run,
-          py::arg("pop_in"),
-          py::arg("obj_func"),
-          py::arg("F"),
-          py::arg("Cr"),
-          py::arg("max_iter"));
+        py::arg("max_iter"),
+        py::arg("dim"),
+        py::arg("obj_func"),
+        py::arg("num_par"),
+        py::arg("lb"),
+        py::arg("ub"),
+        py::arg("pop_in"),
+        py::arg("F") = 0.5,
+        py::arg("Cr") = 0.9
+        );
 }
