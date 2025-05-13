@@ -5,13 +5,19 @@ import os
 from datetime import datetime
 import argparse
 import traceback
-
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.ticker as mticker
 import matplotlib as mpl
-
+scale = 1.7
+mpl.rcParams.update({
+    "axes.labelsize": 14 * scale,      
+    "axes.titlesize": 15 * scale,      
+    "xtick.labelsize": 12 * scale,     
+    "ytick.labelsize": 12 * scale,     
+    "legend.fontsize": 8 * scale      
+})
 from src.python.Config import Configs
 from src.python.Optimizer import HyperParameters, Optimizers
 from src.python.hyperheuristic import HyperHeuristicTemplate, HyperEvaluationFunction
@@ -255,7 +261,7 @@ class MAINCONTROL:
         
         plt.tight_layout()
         fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_1.svg')
-        plt.savefig(fig_save_path)
+        plt.savefig(fig_save_path, dpi=300)
         print(f"{Color.GREEN} Curves figure saved to {fig_save_path}{Color.RESET}")
         self.logging(f"Figure saved to {fig_save_path}")
 
@@ -318,7 +324,7 @@ class MAINCONTROL:
             
             plt.tight_layout()
             fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_2.svg')
-            plt.savefig(fig_save_path)
+            plt.savefig(fig_save_path, dpi=300)
             
             print(f"{Color.GREEN} Combinations figure saved to {fig_save_path}{Color.RESET}")
             self.logging(f"Figure saved to {fig_save_path}")
@@ -375,7 +381,7 @@ class MAINCONTROL:
             
             plt.tight_layout()
             fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_3.svg')
-            plt.savefig(fig_save_path)
+            plt.savefig(fig_save_path,dpi=300)
             print(f"{Color.GREEN} Fitness figure saved to {fig_save_path}{Color.RESET}")
             self.logging(f"Figure saved to {fig_save_path}")
 
@@ -447,7 +453,7 @@ class MAINCONTROL:
             
             plt.tight_layout()
             fig_save_path = os.path.join(self.folder_path, self.folder_name, f'CEC_{self.year}_{self.name}_4.svg')
-            plt.savefig(fig_save_path)
+            plt.savefig(fig_save_path,dpi=300)
             print(f"{Color.GREEN} meta figure saved to {fig_save_path}{Color.RESET}")
             self.logging(f"Figure saved to {fig_save_path}")
         except Exception as e:
