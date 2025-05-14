@@ -1,0 +1,25 @@
+[2025-05-13 09:06:21]: Running DataSet: CEC-2021-F9 - Dimension: 10
+[2025-05-13 21:54:08]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/all_curves.npy
+[2025-05-13 21:54:08]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/all_history_population.npy
+[2025-05-13 21:54:08]: Figure saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/CEC_2021_F9_1.svg
+[2025-05-13 21:54:08]: Figure saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/CEC_2021_F9_2.svg
+[2025-05-13 21:54:08]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/first_reached.npy
+[2025-05-13 21:54:08]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/best_fitness.npy
+[2025-05-13 21:54:09]: Figure saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/CEC_2021_F9_3.svg
+[2025-05-13 21:54:15]: Metaheuristic comparison: [[11793.93966885 11793.93966885 11793.93966885 ...  4750.44219293
+   4750.44219293  4750.44219293]
+ [11793.93966885 11793.93966885 11793.93966885 ...  4750.44219293
+   4750.44219293  4750.44219293]
+ [11793.93966885 11793.93966885 11793.93966885 ...  4750.44219293
+   4750.44219293  4750.44219293]
+ ...
+ [18095.5332295  18076.86578839 17617.91575505 ...  5541.77440405
+   5541.77440405  5541.77440405]
+ [18095.5332295  18076.86578839 17617.91575505 ...  5541.77440405
+   5541.77440405  5541.77440405]
+ [18095.5332295  18076.86578839 17617.91575505 ...  5541.77440405
+   5541.77440405  5541.77440405]]
+[2025-05-13 21:55:27]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/hyper_curve.npy
+[2025-05-13 21:55:27]: Output saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/data/meta_curve.npy
+[2025-05-13 21:55:27]: Figure saved to /home/alvin/1500iter/Auto-meta-heuristic-with-transformers/research_workspace/auto-metaheuristic/exp_result/all_runner/CEC_2021_F9_10D_1500iter_6Ep/CEC_2021_F9_4.svg
+[2025-05-13 21:55:27]: Finished!: DataSet: CEC-2021-F9 - Dimension: 10

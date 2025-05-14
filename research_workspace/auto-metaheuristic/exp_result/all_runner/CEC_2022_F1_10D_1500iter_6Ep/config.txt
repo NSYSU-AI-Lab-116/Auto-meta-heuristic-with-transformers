@@ -1,0 +1,7 @@
+Function Type: CEC
+Year: 2022
+Name: F1
+Dimension: 10
+Iterations: 1500
+Epochs: 6
+num_individual: 20
