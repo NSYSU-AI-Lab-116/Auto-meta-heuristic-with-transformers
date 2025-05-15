@@ -6,15 +6,16 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <map>
+#include <functional>
 
 //using namespace std; // error (maybe)
 namespace py = pybind11;
 using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double lb, double ub, py::array_t<double> pop_in, double F, double Cr)
-{
-    Matrix population(num_par, dim);
-    population = Eigen::Map<Matrix>(reinterpret_cast<double*>(pop_in.mutable_data()), num_par, dim);
-    
+using eval_function = std::function<double(Matrix)>;
+
+std::pair<Matrix, std::vector<double>> DE(int max_iter, int dim, eval_function obj_func, int num_par, double lb, double ub, Matrix population, double F, double Cr)
+{   
     // random engine
     std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     std::uniform_real_distribution<double> uni01(0.0, 1.0);
@@ -28,7 +29,7 @@ py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double 
     for(int i = 0; i < num_par; ++i) 
     {
         // call obj_func from py
-        double fval = obj_func(py::array_t<double>({dim}, population.data() + i*dim)).cast<double>();
+        double fval = obj_func(population);
         fitness[i] = fval;
         if (fval < gbest_score) 
         {
@@ -77,8 +78,7 @@ py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double 
             trial = trial.cwiseMax(lb).cwiseMin(ub);
 
             // eval
-            py::array_t<double> trial_arr({dim}, trial.data());
-            double tf = obj_func(trial_arr).cast<double>();
+            double tf = obj_func(trial);
 
             // choose
             if(tf < fitness[i]) 
@@ -97,14 +97,12 @@ py::tuple run(int max_iter, int dim, py::function obj_func, int num_par, double 
         curve.push_back(gbest_score);
     }
 
-    auto pop_out= py::array_t<double>({num_par, dim},{sizeof(double)*dim, sizeof(double)},population.data());
-    auto curve_out = py::array_t<double>(curve.size(), curve.data());
-    return py::make_tuple(pop_out, curve_out);
+    return std::make_pair(population, curve);
 }
 PYBIND11_MODULE(DE_cpp, m) 
 {
     m.doc() = "Differential Evolution core accelerated with C++";
-    m.def("run", &run,
+    m.def("run", &DE,
         py::arg("max_iter"),
         py::arg("dim"),
         py::arg("obj_func"),
@@ -114,5 +112,5 @@ PYBIND11_MODULE(DE_cpp, m)
         py::arg("pop_in"),
         py::arg("F") = 0.5,
         py::arg("Cr") = 0.9
-        );
+    );
 }

@@ -1,7 +1,6 @@
 import os
 import shutil
 
-
 """Custom command to compile C++ extensions during develop."""
 def compile_ext():
     os_info = {
@@ -16,12 +15,19 @@ def compile_ext():
     for key, value in os_info.items():
         print(f"{key}: {value}")
 
-    print("\n\nCompiling the project...")
-    build_dir = os.path.join(os.getcwd(), "src", "cpp", "build")
+    try:
+        print("\n\nCompiling the project...")
+        build_dir = os.path.join(os.getcwd(), "src", "cpp", "build")
 
-    if os_info["name"] == "posix":
-        shutil.rmtree(build_dir, ignore_errors=True)
-        os.system("cmake . && make -j")
-    elif os_info["name"] == "nt":
-        shutil.rmtree(build_dir, ignore_errors=True)
-        os.system("cmake . && make -j")
+        if os_info["name"] == "posix":
+            shutil.rmtree(build_dir, ignore_errors=True)
+            os.system("cmake . && make -j")
+        elif os_info["name"] == "nt":
+            shutil.rmtree(build_dir, ignore_errors=True)
+            os.system("cmake . && make -j")
+
+        open(os.path.join(build_dir, "__init__.py"), "w").close()
+        print("C++ extensions compiled successfully.")
+    except Exception as e:
+        print(f"Error during compilation: {e}")
+        print("Compilation failed. Please check the logs for more details.")

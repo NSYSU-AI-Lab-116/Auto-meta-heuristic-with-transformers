@@ -3,7 +3,13 @@ git submodule update --init extern/pybind11
 After adding new algos and finising it(algo.run()), do that:
 # rebuild (In Project root directory)
 
-simply run the code in root of this project
 
-$ cmake .
-$ make -j
+＃首次操作建置
+開啟backend並為專案套件建立動態索引
+$ pip install -e .
+
+根據ＣＩ指令開始建置
+$ build
+
+＃後續操作建置
+$ build
