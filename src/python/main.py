@@ -157,7 +157,8 @@ class MAINCONTROL:
         self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
         print(f"{Color.MAGENTA}DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}{Color.RESET}\n")
         print(f"{Color.MAGENTA}Iter: {self.iter} -  Epoch: {self.epochs}{Color.RESET}\n")
-        os.mkdir(os.path.join(self.folder_path, self.folder_name))
+        if not os.path.exists(os.path.join(self.folder_path, self.folder_name)):
+            os.mkdir(os.path.join(self.folder_path, self.folder_name))
         self.logging(f"Running DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
         
         try:
@@ -412,11 +413,14 @@ class MAINCONTROL:
                 
                 for idx, (optname, opt) in enumerate(Optimizers.metaheuristic_list.items()):
                     futures = [(executor.submit(
-                    opt(
-                        HyperParameters.Parameters['meta_iter'], \
-                        HyperParameters.Parameters['num_individual'], \
-                        self.obj_func
-                    ).start))for trial in range(30)]
+                    opt.run(
+                        HyperParameters.Parameters['meta_iter'],
+                        self.obj_func.dim,
+                        self.obj_func.func,
+                        HyperParameters.Parameters['num_individual'],
+                        self.obj_func.lb,
+                        self.obj_func.ub
+                    )))for trial in range(30)]
                     single_curves = None
                     for future in futures:
                         pop , curve = future.result()

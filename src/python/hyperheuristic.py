@@ -6,13 +6,13 @@ from src.python.Optimizer import HyperParameters as HyperParameterClass
 
 Color = Configs.Color # Color -> class
 DataSet = Configs.DataSet # DataSet -> class
-HyperHeuristic = HyperParameterClass.heuristic  # Hyperheuristic optimizer -> class
+HyperHeuristic = HyperParameterClass.heuristic  # Hyperheuristic optimizer -> DE cpp module
 
 optimizers = Optimizers.metaheuristic_list # Metaheuristic optimizers -> dict
 HyperParameters = HyperParameterClass.Parameters # Hyperheuristic parameters -> dict
 
 
-class HyperHeuristicTemplate(HyperHeuristic): # inherit from a meta heuristic algorithm
+class HyperHeuristicTemplate: # inherit from a meta heuristic algorithm
     """ This calss is the ain script of handling the hyperheuristic algorithm
             
             :param obj_function: the objective function to be optimized 
@@ -20,11 +20,20 @@ class HyperHeuristicTemplate(HyperHeuristic): # inherit from a meta heuristic al
             :param color: the color for output display
     """
     def __init__(self, obj_function,hyper_iteration, color):
+        # TODO: calling cpp DE module , call method change required
         self.hyper_func = HyperEvaluationFunction(obj_function,color)
         self.obj_func = obj_function
         self.color = color
-        super().__init__(hyper_iteration,
-                        HyperParameters["num_individual"], self.hyper_func)
+        self.hyper_iteration = hyper_iteration
+        
+    def start(self):
+        result = HyperHeuristic.run(self.hyper_iteration, 
+                       self.hyper_func.dim, 
+                       self.hyper_func.evaluate,
+                       HyperParameters["num_individual"],
+                       self.hyper_func.lb,
+                       self.hyper_func.ub)
+        return result
 
 class HyperEvaluationFunction:
     """ This class is the evaluation function for the hyperheuristic algorithm
@@ -74,7 +83,7 @@ class HyperEvaluationFunction:
 
         split_list = np.int32(param_list[:, 1] / total_split * HyperParameters["meta_iter"])
         split_list[-1] = HyperParameters["meta_iter"] - np.sum(split_list[:-1]) - 1
-        population_storage = None
+        population_storage = np.array([])
         best_population = None
         curve = np.array([])
         global_elite = None
@@ -88,9 +97,14 @@ class HyperEvaluationFunction:
                     population_storage = population_storage.copy()
                     population_storage[0] = global_elite
 
-            population_storage, tmpcurve = optimizer_list[i](iteration,HyperParameters["num_individual"],self.obj_func).start(population_storage)
+            population_storage, tmpcurve = optimizer_list[i].run(int(iteration),
+                                                             self.obj_func.dim, 
+                                                             self.obj_func.func,
+                                                             HyperParameters["num_individual"],
+                                                             self.obj_func.lb[0],
+                                                             self.obj_func.ub[0],
+                                                             population_storage)
             curve = np.concatenate((curve, tmpcurve))
-
             vals = [self.obj_func.func(ind) for ind in population_storage]
             best_idx = int(np.argmin(vals))
             best_val = vals[best_idx]
