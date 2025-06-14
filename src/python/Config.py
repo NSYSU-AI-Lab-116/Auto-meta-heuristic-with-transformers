@@ -1,21 +1,3 @@
-
-""" from optimizers.EDGWO import EDGWOCONTROL
-from optimizers.GWO import GWOCONTROL
-from optimizers.CHGWOSCA import CHGWOSCACONTROL
-from optimizers.REEGWO import REEGWOCONTROL
-from optimizers.MSGWO import MSGWOCONTROL
-from optimizers.PSO import PSOCONTROL
-from optimizers.BES import BESCONTROL
-from optimizers.HHO import HHOCONTROL
-from optimizers.ChOA import ChOACONTROL
-from optimizers.SCSO import SCSOCONTROL
-from optimizers.REINEDGWO import REINEDGWOCONTROL
-from optimizers.DE import DECONTROL
-from optimizers.GA import GACONTROL
-from optimizers.SA import SACONTROL
-from optimizers.TABU import TSCONTROL """
-
-
 # Trial for importing the optimizers directly
 import opfunu as of
 class Configs:
