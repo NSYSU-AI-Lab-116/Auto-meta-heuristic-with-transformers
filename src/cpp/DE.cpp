@@ -6,16 +6,10 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
-#include <map>
-#include <functional>
 
 //using namespace std; // error (maybe)
 namespace py = pybind11;
 using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-using eval_function = std::function<double(Matrix)>;
-
-std::pair<Matrix, std::vector<double>> DE(int max_iter, int dim, eval_function obj_func, int num_par, double lb, double ub, Matrix population, double F, double Cr)
-{   
     // random engine
     std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     std::uniform_real_distribution<double> uni01(0.0, 1.0);
@@ -94,6 +88,7 @@ std::pair<Matrix, std::vector<double>> DE(int max_iter, int dim, eval_function o
                 }
             }
         }
+        population.row(num_par - 1) = Eigen::Map<const Eigen::RowVectorXd>(gbest.data(), dim);
         curve.push_back(gbest_score);
     }
 
@@ -102,7 +97,6 @@ std::pair<Matrix, std::vector<double>> DE(int max_iter, int dim, eval_function o
 PYBIND11_MODULE(DE_cpp, m) 
 {
     m.doc() = "Differential Evolution core accelerated with C++";
-    m.def("run", &DE,
         py::arg("max_iter"),
         py::arg("dim"),
         py::arg("obj_func"),
@@ -112,5 +106,3 @@ PYBIND11_MODULE(DE_cpp, m)
         py::arg("pop_in"),
         py::arg("F") = 0.5,
         py::arg("Cr") = 0.9
-    );
-}
