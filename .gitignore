@@ -5,6 +5,8 @@ old_data/
 .DS_Store
 .vscode/
 *test*
+CMakeFiles
+CMakeCache.txt
 
 
 # Cmake 
