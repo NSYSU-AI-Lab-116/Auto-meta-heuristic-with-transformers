@@ -93,9 +93,9 @@ class BESCONTROL:
         """ print("Best solution found:", best_position)
         print("Best fitness:", best_value) """
         if self.f_type == "d":
-            return (particles, np.array(curve))
+            return (particles, np.array(curve), best_position, best_value)
         else:
-            return (particles, curve)
+            return (particles, curve, best_position, best_value)
 
 
 

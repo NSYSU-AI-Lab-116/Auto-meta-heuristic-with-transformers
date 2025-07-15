@@ -127,7 +127,7 @@ class DECONTROL:
         if self.f_type == "d":
             return (best_position, best_value, population, np.array(curve))
         else:
-            return (population, curve)
+            return (population, curve, best_position, best_value)
 
 
 if __name__ == '__main__':

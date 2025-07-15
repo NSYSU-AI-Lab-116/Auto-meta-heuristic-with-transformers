@@ -95,7 +95,7 @@ class GWOCONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (wolves, curve)
+            return (wolves, curve, best_position, best_value)
 
 if __name__ == '__main__':
     pass

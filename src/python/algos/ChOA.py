@@ -117,7 +117,7 @@ class ChOACONTROL:
         if self.f_type == "d":
             return (chimps, np.array(np.abs(curve)))
         else:
-            return (chimps, curve)
+            return (chimps, curve, best_position, best_value)
 
 if __name__ == '__main__':
     pass

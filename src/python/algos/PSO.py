@@ -92,7 +92,7 @@ class PSOCONTROL:
             """ with open("pso_curve.txt", "a") as f:
                 for i in range(len(curve)):
                     f.write(f"{curve[i]}\n") """
-            return (particles, curve)
+            return (particles, curve, best_position, best_value)
 
 
 if __name__ == '__main__':

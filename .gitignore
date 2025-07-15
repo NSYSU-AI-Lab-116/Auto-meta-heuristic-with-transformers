@@ -1,6 +1,8 @@
 # mutual-gitignore
 all_runner/
 old_data/
+hh_result/
+refined_exp/
 # local configuration files
 .DS_Store
 .vscode/

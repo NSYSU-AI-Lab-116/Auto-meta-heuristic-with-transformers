@@ -111,9 +111,9 @@ class CHGWOSCACONTROL:
         print("Best fitness:", best_value) """
 
         if self.f_type == "d":
-            return (wolves, np.array(curve))
+            return (wolves, np.array(curve), best_position, best_value)
         else:
-            return (wolves, curve)
+            return (wolves, curve, best_position, best_value)
 
 
 

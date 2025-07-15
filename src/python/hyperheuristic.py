@@ -88,7 +88,7 @@ class HyperEvaluationFunction:
                     population_storage = population_storage.copy()
                     population_storage[0] = global_elite
 
-            population_storage, tmpcurve = optimizer_list[i](iteration,HyperParameters["num_individual"],self.obj_func).start(population_storage)
+            population_storage, tmpcurve, best_population, best_fitness = optimizer_list[i](iteration,HyperParameters["num_individual"],self.obj_func).start(population_storage)
             curve = np.concatenate((curve, tmpcurve))
 
             vals = [self.obj_func.func(ind) for ind in population_storage]
@@ -97,7 +97,7 @@ class HyperEvaluationFunction:
             if best_val < global_elite_value:
                 global_elite_value = best_val
                 global_elite = population_storage[best_idx].copy()
-
+        
         #print(f'{self.color}id: {idx} | total: {total_split} | iter: {iteration}{Color.RESET}')
         if return_curve:
             return curve

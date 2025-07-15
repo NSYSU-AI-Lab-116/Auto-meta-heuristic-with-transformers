@@ -105,7 +105,7 @@ class HHOCONTROL:
         if self.f_type == "d":
             return (hawks, np.array(curve))
         else:
-            return (hawks, curve)
+            return (hawks, curve, best_position, best_value)
 
 if __name__ == '__main__':
     pass

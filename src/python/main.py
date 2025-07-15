@@ -159,7 +159,7 @@ class MAINCONTROL:
         self.year = year
         self.name = name
         self.dim = dim
-        self.folder_path = os.path.join(os.getcwd(), "research_workspace", "auto-metaheuristic", "exp_result", "all_runner")
+        self.folder_path = os.path.join(os.getcwd(), "research_workspace", "auto-metaheuristic", "exp_result", "refined_exp")
         self.folder_name = f"{self.f_type}_{self.year}_{self.name}_{self.dim}D_{self.iter}iter_{self.epochs}Ep"
         print(f"{Color.MAGENTA}DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}{Color.RESET}\n")
         print(f"{Color.MAGENTA}Iter: {self.iter} -  Epoch: {self.epochs}{Color.RESET}\n")
@@ -172,8 +172,10 @@ class MAINCONTROL:
             print(f"{time_now()}: {Color.RED}Function load Error: {e}{Color.RESET}")
             self.logging(f"Function load error: {e}")
 
-        all_curves = []
-        all_history_population = []
+        all_history_fitness = []
+        all_trail_population = []
+        all_best_solution = []
+        all_best_fitness = []
 
         try:
             with ProcessPoolExecutor() as executor:
@@ -185,9 +187,11 @@ class MAINCONTROL:
                             for i in range(self.epochs)]
 
                 for i , future in enumerate(futures):
-                    population, curve = future.result()
-                    all_curves.append(curve)
-                    all_history_population.append(population)
+                    population, curve, best_solution, best_fitness = future.result()
+                    all_history_fitness.append(curve)
+                    all_trail_population.append(population)
+                    all_best_solution.append(best_solution)
+                    all_best_fitness.append(best_fitness)
 
 
         except Exception as e:
@@ -196,28 +200,28 @@ class MAINCONTROL:
             traceback.print_exc()
 
         try:
-            for i, (curve, population) in enumerate(zip(all_curves, all_history_population)):
-                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best fitness: {curve[-1]}{Color.RESET}")
-                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best solution: {population[-1]}{Color.RESET}")
+            for i, (curve, population) in enumerate(zip(all_history_fitness, all_trail_population)):
+                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best fitness: {all_best_fitness[i]}{Color.RESET}")
+                print(f"{list(Color.color_set.values())[i%7]} Round {i+1} | Best solution: {all_best_solution[i]}{Color.RESET}")
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Result extract error: {e}{Color.RESET}")
             self.logging(f"Result extract error: {e}")
             traceback.print_exc()
             
-        all_curves = np.array(all_curves)
-        all_history_population = np.array(all_history_population)
-        self.save_output("all_curves.npy", all_curves)
-        self.save_output("all_history_population.npy", all_history_population)
+        all_history_fitness = np.array(all_history_fitness)
+        all_trail_population = np.array(all_trail_population)
+        self.save_output("all_history_fitness.npy", all_history_fitness)
+        self.save_output("all_trail_population.npy", all_trail_population)
         
         try:
-            self.record_and_analize(all_curves, all_history_population)
+            self.record_and_analize(all_history_fitness, all_trail_population)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Record and analyze error: {e}{Color.RESET}")
             self.logging(f"Record error: {e}")
             traceback.print_exc()
         self.logging(f"Finished!: DataSet: {self.f_type}-{self.year}-{self.name} - Dimension: {self.dim}")
 
-    def record_and_analize(self, all_curves, all_history_population):
+    def record_and_analize(self, all_history_fitness, all_trail_population):
         """ plot the chart"""
 
         with open(os.path.join(self.folder_path, self.folder_name, "config.txt"), "a", encoding='utf-8') as f:
@@ -231,26 +235,26 @@ class MAINCONTROL:
 
         with open(os.path.join(self.folder_path, self.folder_name, "output.txt"), "a", encoding='utf-8') as f:
             for i in range(self.epochs):
-                f.write(f"Round {i+1} | Best fitness: {all_curves[i][-1]}\n")
-                f.write(f"Round {i+1} | Best solution: {all_history_population[i][-1]}\n")
+                f.write(f"Round {i+1} | Best fitness: {all_history_fitness[i][-1]}\n")
+                f.write(f"Round {i+1} | Best solution: {all_trail_population[i][-1]}\n")
 
         try:
             self.plot_scale = "Value"
-            all_curves = np.array(all_curves)
+            all_history_fitness = np.array(all_history_fitness)
             axes = plt
-            self.draw_curves(axes, all_curves)
-            self.draw_combination(axes, all_curves, all_history_population)
-            self.draw_best_solution(axes, all_curves)
-            self.draw_hypr_meta_compare(axes, all_curves, all_history_population)
+            self.draw_curves(axes, all_history_fitness)
+            self.draw_combination(axes, all_history_fitness, all_trail_population)
+            self.draw_best_solution(axes, all_history_fitness)
+            self.draw_hypr_meta_compare(axes, all_history_fitness, all_trail_population)
         except Exception as e:
             print(f"{time_now()}: {Color.RED}Plotting error: {e}{Color.RESET}")
             self.logging(f"Plotting error: {e}")
             traceback.print_exc()
 
-    def draw_curves(self, axes, all_curves):
+    def draw_curves(self, axes, all_history_fitness):
         """ draw the curves"""
         fig, ax = plt.subplots(1,1, figsize=(12, 8))
-        for i, curve in enumerate(all_curves):
+        for i, curve in enumerate(all_history_fitness):
             ax.plot(list(range(1,len(curve)+1)),curve, label=f"Round {i+1}", color=plt.get_cmap('inferno')(i/10), linestyle='--')
         ax.set_title("Fitnesses with different Rounds")
         ax.set_xlabel("Times of evaluation")
@@ -265,19 +269,19 @@ class MAINCONTROL:
         print(f"{Color.GREEN} Curves figure saved to {fig_save_path}{Color.RESET}")
         self.logging(f"Figure saved to {fig_save_path}")
 
-    def draw_combination(self, axes, all_curves, all_history_population):
+    def draw_combination(self, axes, all_history_fitness, all_trail_population):
         """ draw the functoion combination of the best solution"""
         try:
             fig, ax = plt.subplots(1,1, figsize=(12, 8))
-            best_population = all_history_population[:,-1]
+            best_population = all_trail_population[:,-1]
             population_dataframe = pd.DataFrame(
                 {
-                    "Epoch": np.repeat(range(1,len(all_curves)+1), 
+                    "Epoch": np.repeat(range(1,len(all_history_fitness)+1), 
                                     HyperParameters.Parameters['num_metaheuristic']),
                     "Priority": best_population[:,::2].flatten(),
                     "Weight": best_population[:,1::2].flatten(),
                     "Param_name":np.tile(np.array(
-                        list(Optimizers.metaheuristic_list.keys())).flatten(),len(all_curves)),
+                        list(Optimizers.metaheuristic_list.keys())).flatten(),len(all_history_fitness)),
                 }
             )
             
@@ -334,21 +338,21 @@ class MAINCONTROL:
             self.logging(f"Error in function combination plot: {e}")
             traceback.print_exc()
 
-    def draw_best_solution(self, axes, all_curves):
+    def draw_best_solution(self, axes, all_history_fitness):
         fig, ax = plt.subplots(1,1, figsize=(12, 8))
         """ draw the best solution"""
         try:
-            min_value = np.min(all_curves, axis=1)
-            max_value = np.max(all_curves, axis=1)
+            min_value = np.min(all_history_fitness, axis=1)
+            max_value = np.max(all_history_fitness, axis=1)
             eighty_percent_point = min_value + 0.15 * (max_value - min_value)
-            first_reached = np.zeros(len(all_curves))
-            for e,curve in enumerate(all_curves):
+            first_reached = np.zeros(len(all_history_fitness))
+            for e,curve in enumerate(all_history_fitness):
                 for i, point in enumerate(curve):
                     if point <= eighty_percent_point[e]:
                         first_reached[e] = i
                         break
 
-            x = list(range(1,len(all_curves)+1))
+            x = list(range(1,len(all_history_fitness)+1))
             
             self.save_output("first_reached.npy", first_reached)
             self.save_output("best_fitness.npy", min_value)
@@ -390,12 +394,12 @@ class MAINCONTROL:
             self.logging(f"Error in convergence speed plot: {e}")
             traceback.print_exc()
 
-    def draw_hypr_meta_compare(self, axes, all_curves, all_history_population):
+    def draw_hypr_meta_compare(self, axes, all_history_fitness, all_trail_population):
         """ draw the population difference"""
         
         try:
             fig, ax = plt.subplots(1,1, figsize=(12, 8))
-            best_population = all_history_population[np.argmin(all_curves[:,-1]),-1]
+            best_population = all_trail_population[np.argmin(all_history_fitness[:,-1]),-1]
 
             hyper_curve = None
             with ProcessPoolExecutor() as executor:
@@ -425,7 +429,7 @@ class MAINCONTROL:
                     ).start))for trial in range(30)]
                     single_curves = None
                     for future in futures:
-                        pop , curve = future.result()
+                        pop , curve, best_pop, best_fitness = future.result()
                         if single_curves is None:
                             single_curves = curve
                         else:

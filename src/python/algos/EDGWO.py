@@ -125,6 +125,7 @@ class EDGWOCONTROL:
     def start(self, init_population=None):
         edgwo = EDGWO(obj_function=self.f, dim=self.DIM, lb=self.LB, ub=self.UB, 
                     num_pop=self.NUM_WOLVES, max_iter=self.MAX_ITER, f_type=self.f_type, init_population=init_population)
+
         best_position, best_value, curve, wolves = edgwo.optimize()
         
         """ print("Best solution found:", best_position)
@@ -133,7 +134,7 @@ class EDGWOCONTROL:
         if self.f_type == "d":
             return (wolves, np.array(curve))
         else:
-            return (wolves, curve)
+            return (wolves, curve, best_position, best_value)
 
 
 if __name__ == '__main__':
