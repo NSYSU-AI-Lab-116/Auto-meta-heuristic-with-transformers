@@ -2,17 +2,18 @@ import numpy as np
 import pandas as pd
 from scipy.stats import kruskal, linregress
 import warnings
+import os
 
 year = "2021"
 warnings.filterwarnings("ignore", category=UserWarning, module="scipy.stats.stats")
 
 
-a_data = np.load("/home/alvin/Hyper-heurisitc-J3C2025/research_workspace/auto-metaheuristic/exp_result/hh_result/data/de_curves.npy").mean(axis=0)
+a_data = np.load(f"{os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/hh_result/data/de_curves.npy").mean(axis=0)
 
 
 b_data_groups = []
 for i in range(6):
-    b_data_groups.append(np.load(f"/home/alvin/Hyper-heurisitc-J3C2025/research_workspace/auto-metaheuristic/exp_result/hh_result/data/{year}_curve_{i+1}.npy"))
+    b_data_groups.append(np.load(f"{os.getcwd()}/research_workspace/auto-metaheuristic/exp_result/hh_result/data/{year}_curve_{i+1}.npy"))
 
 print("--- 數據準備完成 ---")
 print(f"A 數據組數: {len(a_data)}")
@@ -58,7 +59,7 @@ result_array = []
 for i,b in enumerate(delta_values[:-1]):
     for j, b_2 in enumerate(delta_values[i+1:]):
         result = calculate_boolean_array_diff(b, b_2)
-        result_array.append(result["jaccard_similarity"])
+        result_array.append(result["diff_percentage"])
         print(f"\n--- (B{i+1} vs B{j+i+2}) ---")
         print(f"漢明距離: {result['hamming_distance']}")
         print(f"差異百分比: {result['diff_percentage']:.1f}%")
@@ -66,4 +67,4 @@ for i,b in enumerate(delta_values[:-1]):
         print(f"雅卡德距離: {result['jaccard_distance']:.3f}")
 
 print(f"\n--- 綜合結果 ---")
-print(f"平均雅卡德距離：{np.mean(result_array)} ") 
+print(f"相似百分比（穩定度）：{100-np.mean(result_array)} ") 

@@ -1,7 +1,8 @@
 import numpy as np
-from pathlib import Path
 from src.python.Config import Configs
 from src.python.Optimizer import Optimizers, HyperParameters
+from pathlib import Path
+
 
 FUNC_TYPE, YEAR, NAME, DIM = "CEC", "2021", "F9", 10
 ITER, TRIALS = 500, 30                
